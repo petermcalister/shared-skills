@@ -1,0 +1,22 @@
+[
+  {"query": "add a retry mechanism to our API client - it should retry failed requests up to 3 times with exponential backoff", "should_trigger": true},
+  {"query": "fix this bug: empty emails are being accepted by the registration form, they should be rejected with an error message", "should_trigger": true},
+  {"query": "implement a function that parses CSV files, filters rows where status is 'active', and returns the results as JSON", "should_trigger": true},
+  {"query": "build a rate limiter class that allows 100 requests per minute per user, returns 429 when exceeded", "should_trigger": true},
+  {"query": "refactor the UserService to use dependency injection for the database connection instead of the global singleton", "should_trigger": true},
+  {"query": "the password reset flow doesn't check if the token is expired. add expiry validation - tokens should be valid for 1 hour", "should_trigger": true},
+  {"query": "write a middleware that validates JWT tokens in the Authorization header and attaches the decoded user to req.user", "should_trigger": true},
+  {"query": "implement pagination for the /api/products endpoint - support page, limit, and sort parameters", "should_trigger": true},
+  {"query": "add input sanitization to our form handler - strip HTML tags, trim whitespace, and validate email format", "should_trigger": true},
+  {"query": "build a cache wrapper that stores results in Redis with a configurable TTL and handles cache misses by calling the underlying service", "should_trigger": true},
+  {"query": "create a mermaid sequence diagram showing how our auth service validates JWT tokens and refreshes expired ones", "should_trigger": false},
+  {"query": "draw an excalidraw architecture diagram of our Kubernetes cluster", "should_trigger": false},
+  {"query": "set up shared skills for my new project using the additionalDirectories approach", "should_trigger": false},
+  {"query": "build a Claude Code plugin that adds a /deploy command for our staging environment", "should_trigger": false},
+  {"query": "explain the difference between OAuth2 PKCE flow and authorization code flow for mobile apps", "should_trigger": false},
+  {"query": "review the pull request at #42 and check if the SQL queries are safe from injection", "should_trigger": false},
+  {"query": "set up a Docker Compose file with postgres 16, redis 7, and our node app for local development", "should_trigger": false},
+  {"query": "what's the best way to structure a monorepo for our 3 microservices? should we use turborepo or nx?", "should_trigger": false},
+  {"query": "help me debug why the CI pipeline is failing — the Jest tests pass locally but timeout in GitHub Actions", "should_trigger": false},
+  {"query": "read the README.md and summarize what this project does and how to set it up", "should_trigger": false}
+]

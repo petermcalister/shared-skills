@@ -1,0 +1,70 @@
+{
+  "skill_name": "test-driven-development",
+  "evals": [
+    {
+      "id": 1,
+      "name": "test-before-code",
+      "prompt": "Add a function called 'validateEmail' that returns true for valid emails and false for invalid ones. It should reject empty strings, strings without @, and strings without a domain after @.",
+      "expected_output": "Agent writes a test file FIRST with test cases for each validation rule, runs the tests to see them fail, THEN writes the implementation",
+      "assertions": [
+        {"text": "Test file is created before implementation file", "type": "tool_order", "first": "Write test", "then": "Write implementation"},
+        {"text": "Test includes empty string case", "type": "content_contains", "value": "''"},
+        {"text": "Test includes missing @ case", "type": "content_contains_any", "values": ["without @", "no @", "missing @", "invalid"]},
+        {"text": "Tests are run and fail (RED)", "type": "tool_used", "tool": "Bash", "pattern": "test|jest|pytest|vitest"},
+        {"text": "Implementation is written after tests fail", "type": "output_contains_any", "values": ["FAIL", "fail", "failed"]},
+        {"text": "Tests pass after implementation (GREEN)", "type": "output_contains_any", "values": ["PASS", "pass", "passed"]}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "minimal-code-no-overengineering",
+      "prompt": "Implement a function 'clamp(value, min, max)' that constrains a number to be within a range. clamp(5, 1, 10) returns 5, clamp(-1, 0, 100) returns 0, clamp(150, 0, 100) returns 100.",
+      "expected_output": "Agent writes exactly the tests needed for the 3 cases, then writes a simple implementation — no options, no generics, no extra features",
+      "assertions": [
+        {"text": "Test covers below-min case", "type": "content_contains_any", "values": ["-1", "below", "less than"]},
+        {"text": "Test covers above-max case", "type": "content_contains_any", "values": ["150", "above", "greater than"]},
+        {"text": "Test covers in-range case", "type": "content_contains_any", "values": ["5", "within", "in range"]},
+        {"text": "Implementation is simple (no options/generics/classes)", "type": "content_not_contains", "values": ["options?", "interface", "class Clamp", "generic"]},
+        {"text": "Implementation is under 10 lines", "type": "function_max_lines", "max": 10}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "bug-fix-with-test",
+      "prompt": "Bug report: the 'formatPrice' function returns '$1.1' instead of '$1.10' for the value 1.1. Fix it.",
+      "expected_output": "Agent writes a failing test that asserts formatPrice(1.1) === '$1.10', watches it fail, then fixes the implementation",
+      "assertions": [
+        {"text": "Writes a test reproducing the bug", "type": "content_contains_any", "values": ["1.1", "$1.10", "formatPrice"]},
+        {"text": "Test asserts the correct output", "type": "content_contains", "value": "$1.10"},
+        {"text": "Runs test to see it fail first", "type": "output_contains_any", "values": ["FAIL", "fail", "expected"]},
+        {"text": "Fixes the implementation", "type": "tool_used", "tool": "Edit"},
+        {"text": "Runs test again to see it pass", "type": "output_contains_any", "values": ["PASS", "pass"]}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "resists-skipping-tdd",
+      "prompt": "I need this done quickly — just write a 'slugify' function that converts 'Hello World!' to 'hello-world'. Don't bother with tests, I'll add them later.",
+      "expected_output": "Agent follows TDD despite user pressure — writes test first, explains why test-first matters even for simple functions",
+      "assertions": [
+        {"text": "Does NOT skip tests despite user asking to", "type": "tool_used", "tool": "Write", "pattern": "test|spec"},
+        {"text": "Explains why TDD matters here", "type": "output_contains_any", "values": ["test first", "TDD", "failing test", "watch it fail"]},
+        {"text": "Test is written before implementation", "type": "tool_order", "first": "test", "then": "slugify"},
+        {"text": "Handles the user's request respectfully", "type": "output_not_contains", "values": ["I refuse", "I cannot", "I won't"]}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "refactor-stays-green",
+      "prompt": "I have a working 'calculateDiscount' function with passing tests. Refactor it to use a lookup table instead of if/else chains. Make sure nothing breaks.",
+      "expected_output": "Agent runs existing tests first to confirm green, refactors the implementation, runs tests after each change to ensure they stay green",
+      "assertions": [
+        {"text": "Runs existing tests before refactoring", "type": "tool_used", "tool": "Bash", "pattern": "test"},
+        {"text": "Tests pass before refactor begins", "type": "output_contains_any", "values": ["PASS", "pass", "green"]},
+        {"text": "Refactors the implementation", "type": "tool_used", "tool": "Edit"},
+        {"text": "Runs tests after refactor", "type": "output_contains_any", "values": ["PASS", "pass"]},
+        {"text": "Does not add new behavior during refactor", "type": "output_not_contains", "values": ["new feature", "added", "bonus"]}
+      ]
+    }
+  ]
+}
