@@ -25,13 +25,13 @@ Mermaid diagram system with specialized guides, resilient validation, and code-t
 
 | User says... | Load guide |
 |-------------|-----------|
-| "workflow", "process", "business logic", "user flow" | `${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagram/references/guides/diagrams/activity-diagrams.md` |
-| "infrastructure", "deployment", "cloud", "K8s" | `${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagram/references/guides/diagrams/deployment-diagrams.md` |
-| "system architecture", "components", "microservices" | `${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagram/references/guides/diagrams/architecture-diagrams.md` |
-| "API flow", "interactions", "sequence" | `${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagram/references/guides/diagrams/sequence-diagrams.md` |
-| General diagram or unsure | `${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagram/references/mermaid-diagram-guide.md` |
+| "workflow", "process", "business logic", "user flow" | `.claude/skills/mermaid-diagram/references/guides/diagrams/activity-diagrams.md` |
+| "infrastructure", "deployment", "cloud", "K8s" | `.claude/skills/mermaid-diagram/references/guides/diagrams/deployment-diagrams.md` |
+| "system architecture", "components", "microservices" | `.claude/skills/mermaid-diagram/references/guides/diagrams/architecture-diagrams.md` |
+| "API flow", "interactions", "sequence" | `.claude/skills/mermaid-diagram/references/guides/diagrams/sequence-diagrams.md` |
+| General diagram or unsure | `.claude/skills/mermaid-diagram/references/mermaid-diagram-guide.md` |
 
-For troubleshooting syntax errors, read: `${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagram/references/guides/troubleshooting.md`
+For troubleshooting syntax errors, read: `.claude/skills/mermaid-diagram/references/guides/troubleshooting.md`
 
 ## Resilient Workflow (MANDATORY)
 
@@ -41,7 +41,7 @@ For troubleshooting syntax errors, read: `${CLAUDE_PLUGIN_ROOT}/skills/mermaid-d
 1. Identify diagram type → Load appropriate guide
 2. Write .mmd file with naming convention
 3. Validate via mmdc:
-   python ${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagram/scripts/validate_mermaid.py \
+   python .claude/skills/mermaid-diagram/scripts/validate_mermaid.py \
      --code "$(cat diagram.mmd)" --output diagram.png --json
 4. IF success → Deliver diagram
    IF error → Read troubleshooting.md → Fix syntax → Retry (max 3 attempts)
@@ -54,10 +54,10 @@ For troubleshooting syntax errors, read: `${CLAUDE_PLUGIN_ROOT}/skills/mermaid-d
 mmdc -i diagram.mmd -o diagram.png -b transparent
 
 # Extract and validate all diagrams in a markdown file
-python ${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagram/scripts/extract_mermaid.py doc.md --validate
+python .claude/skills/mermaid-diagram/scripts/extract_mermaid.py doc.md --validate
 
 # Batch convert all .mmd files to PNG
-python ${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagram/scripts/mermaid_to_image.py diagrams/ output/ --format png
+python .claude/skills/mermaid-diagram/scripts/mermaid_to_image.py diagrams/ output/ --format png
 ```
 
 ### File Naming Convention
@@ -94,7 +94,7 @@ Enhance diagram clarity with Unicode symbols:
 | Security | 🔐 🔑 🛡️ 🚪 👤 |
 | Monitoring | 📝 📊 🚨 ⚠️ ✅ ❌ |
 
-Full reference: `${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagram/references/guides/unicode-symbols/guide.md`
+Full reference: `.claude/skills/mermaid-diagram/references/guides/unicode-symbols/guide.md`
 
 ## Python Utilities
 

@@ -14,7 +14,7 @@ Generate `.excalidraw` JSON files that **argue visually**, not just display info
 
 ## Customization
 
-**All colors live in one file:** read `${CLAUDE_PLUGIN_ROOT}/skills/excalidraw-diagram/references/color-palette.md` before generating any diagram. It is the single source of truth for all color choices.
+**All colors live in one file:** read `.claude/skills/excalidraw-diagram/references/color-palette.md` before generating any diagram. It is the single source of truth for all color choices.
 
 ---
 
@@ -69,7 +69,7 @@ Each major concept must use a **different** visual pattern. No uniform cards or 
 Mentally trace how the eye moves through the diagram. Clear visual story.
 
 ### Step 5: Generate JSON
-See element templates: `${CLAUDE_PLUGIN_ROOT}/skills/excalidraw-diagram/references/element-templates.md`
+See element templates: `.claude/skills/excalidraw-diagram/references/element-templates.md`
 
 ### Step 6: Render & Validate (MANDATORY)
 See Render & Validate section below.
@@ -181,7 +181,7 @@ You cannot judge a diagram from JSON alone. After generating, you MUST render an
 ### How to Render
 
 ```bash
-cd ${CLAUDE_PLUGIN_ROOT}/skills/excalidraw-diagram/references && uv run python render_excalidraw.py <path-to-file.excalidraw>
+cd .claude/skills/excalidraw-diagram/references && uv run python render_excalidraw.py <path-to-file.excalidraw>
 ```
 
 Outputs PNG next to the `.excalidraw` file. View it with the Read tool.
@@ -211,7 +211,7 @@ Outputs PNG next to the `.excalidraw` file. View it with the Read tool.
 ### First-Time Setup
 
 ```bash
-cd ${CLAUDE_PLUGIN_ROOT}/skills/excalidraw-diagram/references
+cd .claude/skills/excalidraw-diagram/references
 uv sync
 uv run playwright install chromium
 ```

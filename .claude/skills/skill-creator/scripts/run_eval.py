@@ -8,7 +8,6 @@ for a set of queries. Outputs results as JSON.
 import argparse
 import json
 import os
-import select
 import subprocess
 import sys
 import time
@@ -65,7 +64,7 @@ def run_single_query(
             f"# {skill_name}\n\n"
             f"This skill handles: {skill_description}\n"
         )
-        command_file.write_text(command_content)
+        command_file.write_text(command_content, encoding="utf-8")
 
         cmd = [
             "claude",
@@ -98,19 +97,37 @@ def run_single_query(
         accumulated_json = ""
 
         try:
+            # On Windows, select.select() doesn't work on pipes.
+            # Use a thread to read stdout non-blockingly.
+            import threading
+            import queue as _queue
+
+            read_queue: _queue.Queue[bytes | None] = _queue.Queue()
+
+            def _reader():
+                try:
+                    while True:
+                        chunk = process.stdout.read(8192)
+                        if not chunk:
+                            read_queue.put(None)
+                            break
+                        read_queue.put(chunk)
+                except Exception:
+                    read_queue.put(None)
+
+            reader_thread = threading.Thread(target=_reader, daemon=True)
+            reader_thread.start()
+
             while time.time() - start_time < timeout:
-                if process.poll() is not None:
-                    remaining = process.stdout.read()
-                    if remaining:
-                        buffer += remaining.decode("utf-8", errors="replace")
+                if process.poll() is not None and read_queue.empty():
                     break
 
-                ready, _, _ = select.select([process.stdout], [], [], 1.0)
-                if not ready:
+                try:
+                    chunk = read_queue.get(timeout=1.0)
+                except _queue.Empty:
                     continue
 
-                chunk = os.read(process.stdout.fileno(), 8192)
-                if not chunk:
+                if chunk is None:
                     break
                 buffer += chunk.decode("utf-8", errors="replace")
 
@@ -269,7 +286,7 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="Print progress to stderr")
     args = parser.parse_args()
 
-    eval_set = json.loads(Path(args.eval_set).read_text())
+    eval_set = json.loads(Path(args.eval_set).read_text(encoding="utf-8"))
     skill_path = Path(args.skill_path)
 
     if not (skill_path / "SKILL.md").exists():
