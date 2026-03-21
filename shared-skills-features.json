@@ -1,0 +1,165 @@
+{
+  "plan_name": "shared-skills",
+  "created": "2026-03-21",
+  "updated": "2026-03-21",
+  "reference_repos": {
+    "mermaid": "SpillwaveSolutions/design-doc-mermaid",
+    "excalidraw": "coleam00/excalidraw-diagram-skill"
+  },
+  "features": [
+    {
+      "id": "F001",
+      "phase": 1,
+      "description": "Create shared-skills repo on GitHub + clone locally to ~/RepoBase/shared-skills",
+      "acceptance": "gh repo view petermcalister/shared-skills succeeds; local clone exists at ~/RepoBase/shared-skills with README.md and correct directory scaffold",
+      "passes": false
+    },
+    {
+      "id": "F002",
+      "phase": 1,
+      "description": "Scaffold shared-skills repo structure (skills/, skill-creator/, evals/, variants/)",
+      "acceptance": "Repo has: skills/ (empty), skill-creator/ (with placeholder SKILL.md), evals/ (runner scaffold), variants/ (registry.json), .gitignore, README.md",
+      "passes": true
+    },
+    {
+      "id": "F003",
+      "phase": 1,
+      "description": "Install @mermaid-js/mermaid-cli globally and verify mmdc works",
+      "acceptance": "mmdc --version returns a version; mmdc -i test.mmd -o test.png renders a simple flowchart without error",
+      "passes": true
+    },
+    {
+      "id": "F004",
+      "phase": 2,
+      "description": "Create Mermaid SKILL.md in pete-pa with hierarchical routing decision tree (based on SpillwaveSolutions). Routes user intent to specialized guides: activity, deployment, architecture, sequence diagrams, code-to-diagram, design doc templates. Includes resilient workflow with error recovery.",
+      "acceptance": "pete-pa/skills/mermaid-diagram/SKILL.md exists with: YAML frontmatter (name, description, version), decision tree routing to per-type guides, resilient workflow section (validate \u00e2\u2020\u2019 troubleshoot \u00e2\u2020\u2019 retry), file naming conventions, references to all guide files",
+      "passes": true
+    },
+    {
+      "id": "F005",
+      "phase": 2,
+      "description": "Port Mermaid Python utility scripts from SpillwaveSolutions: extract_mermaid.py (extract + validate diagrams from markdown), mermaid_to_image.py (render .mmd to PNG/SVG with themes + batch), validate_mermaid.py (resilient workflow with error recovery)",
+      "acceptance": "All 3 scripts in pete-pa/skills/mermaid-diagram/scripts/. extract_mermaid.py: --validate flag works with mmdc, --list-only shows diagram metadata, --replace-with-images substitutes code blocks. mermaid_to_image.py: single + batch render, --theme support. validate_mermaid.py: save .mmd + render + validate + error recovery loop.",
+      "passes": true
+    },
+    {
+      "id": "F006",
+      "phase": 2,
+      "description": "Create Mermaid reference guides: comprehensive diagram-type guide, per-type specialized guides (activity, deployment, architecture, sequence), 28-error troubleshooting catalog, unicode semantic symbols guide",
+      "acceptance": "pete-pa/skills/mermaid-diagram/references/ contains: mermaid-diagram-guide.md (diagram type selection + syntax), guides/diagrams/ (4 specialized guides), guides/troubleshooting.md (28+ errors with severity, incorrect/correct examples, fixes), guides/unicode-symbols/guide.md (10+ symbol categories)",
+      "passes": true
+    },
+    {
+      "id": "F007",
+      "phase": 2,
+      "description": "Create Mermaid command launcher in pete-pa and test by generating a real diagram",
+      "acceptance": "pete-pa/commands/diagram-mermaid.md exists with YAML frontmatter (description, allowed-tools: Read Write Bash Glob, model: sonnet); loads mermaid-diagram skill; tested by generating a flowchart .mmd that validates with mmdc and renders to PNG",
+      "passes": true
+    },
+    {
+      "id": "F008",
+      "phase": 3,
+      "description": "Create Excalidraw reference files (based on coleam00): json-schema.md (element types, properties, bindings), color-palette.md (semantic color system \u00e2\u20ac\u201d single customization point), element-templates.md (copy-paste JSON templates for each element type)",
+      "acceptance": "pete-pa/skills/excalidraw-diagram/references/ contains: json-schema.md (element types, common/text/arrow-specific properties, binding format, roundness), color-palette.md (semantic shape colors, text hierarchy colors, evidence artifact colors, stroke/line colors), element-templates.md (templates for free-floating text, line, dot, rectangle, text-in-shape, arrow)",
+      "passes": true
+    },
+    {
+      "id": "F009",
+      "phase": 3,
+      "description": "Create Excalidraw Playwright render pipeline (based on coleam00): render_excalidraw.py (JSON \u00e2\u2020\u2019 PNG via headless Chromium), render_template.html (loads @excalidraw/excalidraw from esm.sh), pyproject.toml (playwright dependency for uv)",
+      "acceptance": "pete-pa/skills/excalidraw-diagram/references/ contains: render_excalidraw.py (validates JSON, computes bounding box, renders via Playwright, outputs PNG), render_template.html (ES module importing exportToSvg from esm.sh), pyproject.toml (playwright as dependency). First-time setup works: uv sync && uv run playwright install chromium",
+      "passes": true
+    },
+    {
+      "id": "F010",
+      "phase": 3,
+      "description": "Create Excalidraw SKILL.md in pete-pa (based on coleam00) with: 'argue not display' philosophy, depth assessment routing (simple vs comprehensive), research mandate for technical diagrams, evidence artifacts, multi-zoom architecture, container discipline, visual pattern library, section-by-section large diagram strategy, MANDATORY render-view-fix loop, 27-point quality checklist",
+      "acceptance": "pete-pa/skills/excalidraw-diagram/SKILL.md exists with: YAML frontmatter (name, description, version), core philosophy (isomorphism test, education test), depth assessment, design process (6 steps), visual pattern library (8+ patterns), large diagram strategy, text rules, JSON structure, render & validate section (mandatory loop with specific defect checklist), quality checklist (27 items across 5 categories)",
+      "passes": true
+    },
+    {
+      "id": "F011",
+      "phase": 3,
+      "description": "Create Excalidraw command launcher in pete-pa and test by generating a real diagram with render validation",
+      "acceptance": "pete-pa/commands/diagram-excalidraw.md exists with YAML frontmatter (description, allowed-tools: Read Write Bash Glob, model: sonnet); loads excalidraw-diagram skill; tested by generating a simple .excalidraw file that renders to PNG via render_excalidraw.py",
+      "passes": true
+    },
+    {
+      "id": "F012",
+      "phase": 4,
+      "description": "Port Anthropic skill-creator SKILL.md to shared-skills repo (adapted to Pete's patterns)",
+      "acceptance": "shared-skills/skill-creator/SKILL.md exists; 5-stage workflow preserved (capture intent, interview, write SKILL.md, test/evaluate, iterate); adapted references to shared-skills repo structure; references Pete's YAML frontmatter conventions (name, description, version); includes description optimization stage",
+      "passes": true
+    },
+    {
+      "id": "F013",
+      "phase": 4,
+      "description": "Port skill-creator agent prompts (grader, comparator, analyzer)",
+      "acceptance": "shared-skills/skill-creator/agents/ contains grader.md, comparator.md, analyzer.md; adapted from Anthropic originals; grader evaluates skill output quality; comparator does A/B variant comparison; analyzer examines benchmark trends",
+      "passes": true
+    },
+    {
+      "id": "F014",
+      "phase": 4,
+      "description": "Port eval scripts (run_eval.py, generate_report.py, aggregate_benchmark.py, utils.py)",
+      "acceptance": "shared-skills/skill-creator/scripts/ contains run_eval.py, generate_report.py, aggregate_benchmark.py, utils.py; scripts adapted to work with shared-skills directory structure; run_eval.py can test if a skill triggers correctly for a set of queries; aggregate_benchmark.py summarizes pass/fail rates",
+      "passes": true
+    },
+    {
+      "id": "F015",
+      "phase": 4,
+      "description": "Port eval helper scripts (improve_description.py, package_skill.py, quick_validate.py, run_loop.py)",
+      "acceptance": "shared-skills/skill-creator/scripts/ contains improve_description.py, package_skill.py, quick_validate.py, run_loop.py; improve_description.py optimizes skill trigger accuracy; package_skill.py bundles a skill directory; quick_validate.py does fast sanity check; run_loop.py orchestrates full eval workflow",
+      "passes": true
+    },
+    {
+      "id": "F016",
+      "phase": 4,
+      "description": "Port eval viewer (viewer.html + generate_review.py)",
+      "acceptance": "shared-skills/skill-creator/eval-viewer/ contains viewer.html and generate_review.py; viewer shows dual-panel (outputs + benchmark); generate_review.py creates review data from eval results; viewer opens in browser and displays test results",
+      "passes": true
+    },
+    {
+      "id": "F017",
+      "phase": 4,
+      "description": "Port schemas reference and create skill template",
+      "acceptance": "shared-skills/skill-creator/references/schemas.md exists with JSON schemas for eval data structures; shared-skills/template/SKILL.md exists with Pete's YAML frontmatter conventions (name, description, version); template includes placeholder sections matching Pete's skill patterns",
+      "passes": true
+    },
+    {
+      "id": "F018",
+      "phase": 4,
+      "description": "Create A/B variant infrastructure in shared-skills",
+      "acceptance": "shared-skills/variants/registry.json exists (empty registry); shared-skills/variants/README.md documents the A/B workflow (create variant B alongside champion A, run evals against both, promote winner); directory convention: variants/{skill-name}/A/SKILL.md and B/SKILL.md",
+      "passes": true
+    },
+    {
+      "id": "F019",
+      "phase": 5,
+      "description": "Wire git submodule from cowork to shared-skills",
+      "acceptance": "cowork/.gitmodules references petermcalister/shared-skills; cowork/.claude/skills/shared/ is a submodule checkout of shared-skills/skills/; git submodule update --init in a fresh clone populates the directory",
+      "passes": false
+    },
+    {
+      "id": "F020",
+      "phase": 5,
+      "description": "Graduate diagram skills from pete-pa to shared-skills (move + symlink or reference update)",
+      "acceptance": "Mermaid and Excalidraw skills exist in shared-skills/skills/; pete-pa commands updated to reference skills from shared-skills via submodule path OR skills remain in pete-pa with copies in shared-skills (agent decides based on what works for plugin packaging)",
+      "passes": false
+    },
+    {
+      "id": "F021",
+      "phase": 5,
+      "description": "Run skill-creator eval on both diagram skills as validation",
+      "acceptance": "run_eval.py executed against mermaid-diagram and excalidraw-diagram skills; trigger queries tested (at least 8 should-trigger, 8 should-not per skill); both skills achieve >80% trigger accuracy; eval results saved to shared-skills/evals/results/",
+      "passes": false
+    },
+    {
+      "id": "F022",
+      "phase": 5,
+      "description": "Update pete-pa plugin version and CLAUDE.md documentation",
+      "acceptance": "pete-pa plugin.json version bumped; CLAUDE.md updated with diagram skills section, shared-skills submodule section; deploy-plugin.sh still produces valid .plugin.zip",
+      "passes": false
+    }
+  ]
+}

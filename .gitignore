@@ -1,0 +1,14 @@
+evals/results/
+__pycache__/
+*.pyc
+.env
+*.egg-info/
+dist/
+build/
+.venv/
+node_modules/
+*.png
+*.svg
+*.pdf
+.claude/settings.local.json
+diagrams/

@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "defaultMode": "auto",
+    "allow": [
+      "Bash(*)",
+      "Read",
+      "Write",
+      "Edit",
+      "WebFetch",
+      "Agent",
+      "Glob",
+      "Grep",
+      "TaskCreate",
+      "TaskUpdate",
+      "TaskGet",
+      "TaskList",
+      "TaskOutput",
+      "TaskStop",
+      "SendMessage",
+      "NotebookEdit",
+      "mcp__claude_ai_Mermaid_Chart__validate_and_render_mermaid_diagram"
+    ],
+    "deny": [
+      "Bash(rm -rf /)*"
+    ],
+    "additionalDirectories": [
+      "C:/Users/peter/RepoBase/cowork"
+    ]
+  }
+}
