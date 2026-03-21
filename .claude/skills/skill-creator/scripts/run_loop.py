@@ -281,12 +281,11 @@ def main():
         live_report_path = None
 
     # Determine output directory (create before run_loop so logs can be written)
-    if args.results_dir:
-        timestamp = time.strftime("%Y-%m-%d_%H%M%S")
-        results_dir = Path(args.results_dir) / timestamp
-        results_dir.mkdir(parents=True, exist_ok=True)
-    else:
-        results_dir = None
+    # Default to <skill-path>/evals/results/ if not specified
+    results_base = args.results_dir or str(Path(args.skill_path) / "evals" / "results")
+    timestamp = time.strftime("%Y-%m-%d_%H%M%S")
+    results_dir = Path(results_base) / timestamp
+    results_dir.mkdir(parents=True, exist_ok=True)
 
     log_dir = results_dir / "logs" if results_dir else None
 

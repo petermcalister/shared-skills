@@ -1,4 +1,4 @@
-evals/results/
+**/evals/results/
 __pycache__/
 *.pyc
 .env
