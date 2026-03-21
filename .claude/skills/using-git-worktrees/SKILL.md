@@ -1,139 +1,76 @@
 ---
 name: using-git-worktrees
-description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification
+description: >
+  Use when starting feature work that needs isolation from the current workspace,
+  working on multiple branches simultaneously, or before executing an implementation
+  plan that shouldn't affect the main working tree. Trigger on: "create a worktree",
+  "isolated workspace", "work on a branch without switching", "set up a feature branch",
+  "parallel branch work", or when the user wants to implement something without
+  disturbing their current working state.
+version: 0.1.0
 ---
 
 # Using Git Worktrees
 
-## Overview
+Create isolated workspaces sharing the same repository — work on multiple branches
+simultaneously without switching.
 
-Git worktrees create isolated workspaces sharing the same repository, allowing work on multiple branches simultaneously without switching.
+## Directory Selection
 
-**Core principle:** Systematic directory selection + safety verification = reliable isolation.
+Follow this priority:
 
-**Announce at start:** "I'm using the using-git-worktrees skill to set up an isolated workspace."
-
-## Directory Selection Process
-
-Follow this priority order:
-
-### 1. Check Existing Directories
-
-```bash
-# Check in priority order
-ls -d .worktrees 2>/dev/null     # Preferred (hidden)
-ls -d worktrees 2>/dev/null      # Alternative
-```
-
-**If found:** Use that directory. If both exist, `.worktrees` wins.
-
-### 2. Check CLAUDE.md
-
-```bash
-grep -i "worktree.*director" CLAUDE.md 2>/dev/null
-```
-
-**If preference specified:** Use it without asking.
-
-### 3. Ask User
-
-If no directory exists and no CLAUDE.md preference:
-
-```
-No worktree directory found. Where should I create worktrees?
-
-1. .worktrees/ (project-local, hidden)
-2. ~/.config/superpowers/worktrees/<project-name>/ (global location)
-
-Which would you prefer?
-```
+1. **Check existing directories:** `.worktrees/` (preferred) or `worktrees/`
+2. **Check CLAUDE.md** for a worktree directory preference
+3. **Ask the user** — suggest `.worktrees/` (project-local, hidden) or a global location
 
 ## Safety Verification
 
-### For Project-Local Directories (.worktrees or worktrees)
-
-**MUST verify directory is ignored before creating worktree:**
+For project-local directories, verify the worktree directory is gitignored before
+creating anything — unignored worktree contents pollute git status and risk accidental commits.
 
 ```bash
-# Check if directory is ignored (respects local, global, and system gitignore)
-git check-ignore -q .worktrees 2>/dev/null || git check-ignore -q worktrees 2>/dev/null
+git check-ignore -q .worktrees 2>/dev/null
 ```
 
-**If NOT ignored:**
+If not ignored: add to `.gitignore` and commit before proceeding.
 
-Per Jesse's rule "Fix broken things immediately":
-1. Add appropriate line to .gitignore
-2. Commit the change
-3. Proceed with worktree creation
-
-**Why critical:** Prevents accidentally committing worktree contents to repository.
-
-### For Global Directory (~/.config/superpowers/worktrees)
-
-No .gitignore verification needed - outside project entirely.
+Global directories (outside the project) don't need this check.
 
 ## Creation Steps
 
-### 1. Detect Project Name
+### 1. Create the worktree
 
 ```bash
 project=$(basename "$(git rev-parse --show-toplevel)")
+git worktree add .worktrees/$BRANCH_NAME -b $BRANCH_NAME
+cd .worktrees/$BRANCH_NAME
 ```
 
-### 2. Create Worktree
+### 2. Run project setup
+
+Auto-detect from project files:
 
 ```bash
-# Determine full path
-case $LOCATION in
-  .worktrees|worktrees)
-    path="$LOCATION/$BRANCH_NAME"
-    ;;
-  ~/.config/superpowers/worktrees/*)
-    path="~/.config/superpowers/worktrees/$project/$BRANCH_NAME"
-    ;;
-esac
-
-# Create worktree with new branch
-git worktree add "$path" -b "$BRANCH_NAME"
-cd "$path"
+[ -f package.json ] && npm install
+[ -f pyproject.toml ] && poetry install
+[ -f Cargo.toml ] && cargo build
+[ -f go.mod ] && go mod download
+[ -f requirements.txt ] && pip install -r requirements.txt
 ```
 
-### 3. Run Project Setup
+### 3. Verify clean baseline
 
-Auto-detect and run appropriate setup:
+Run the project's test suite to confirm the worktree starts clean:
 
 ```bash
-# Node.js
-if [ -f package.json ]; then npm install; fi
-
-# Rust
-if [ -f Cargo.toml ]; then cargo build; fi
-
-# Python
-if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-if [ -f pyproject.toml ]; then poetry install; fi
-
-# Go
-if [ -f go.mod ]; then go mod download; fi
+# Use the project-appropriate test command
+npm test / pytest / cargo test / go test ./...
 ```
 
-### 4. Verify Clean Baseline
+If tests fail: report the failures and ask whether to proceed or investigate.
+If tests pass: report ready.
 
-Run tests to ensure worktree starts clean:
-
-```bash
-# Examples - use project-appropriate command
-npm test
-cargo test
-pytest
-go test ./...
-```
-
-**If tests fail:** Report failures, ask whether to proceed or investigate.
-
-**If tests pass:** Report ready.
-
-### 5. Report Location
+### 4. Report
 
 ```
 Worktree ready at <full-path>
@@ -148,70 +85,14 @@ Ready to implement <feature-name>
 | `.worktrees/` exists | Use it (verify ignored) |
 | `worktrees/` exists | Use it (verify ignored) |
 | Both exist | Use `.worktrees/` |
-| Neither exists | Check CLAUDE.md → Ask user |
-| Directory not ignored | Add to .gitignore + commit |
-| Tests fail during baseline | Report failures + ask |
-| No package.json/Cargo.toml | Skip dependency install |
+| Neither exists | Check CLAUDE.md, then ask user |
+| Directory not ignored | Add to .gitignore + commit first |
+| Tests fail at baseline | Report failures + ask |
+| No package.json etc. | Skip dependency install |
 
 ## Common Mistakes
 
-### Skipping ignore verification
-
-- **Problem:** Worktree contents get tracked, pollute git status
-- **Fix:** Always use `git check-ignore` before creating project-local worktree
-
-### Assuming directory location
-
-- **Problem:** Creates inconsistency, violates project conventions
-- **Fix:** Follow priority: existing > CLAUDE.md > ask
-
-### Proceeding with failing tests
-
-- **Problem:** Can't distinguish new bugs from pre-existing issues
-- **Fix:** Report failures, get explicit permission to proceed
-
-### Hardcoding setup commands
-
-- **Problem:** Breaks on projects using different tools
-- **Fix:** Auto-detect from project files (package.json, etc.)
-
-## Example Workflow
-
-```
-You: I'm using the using-git-worktrees skill to set up an isolated workspace.
-
-[Check .worktrees/ - exists]
-[Verify ignored - git check-ignore confirms .worktrees/ is ignored]
-[Create worktree: git worktree add .worktrees/auth -b feature/auth]
-[Run npm install]
-[Run npm test - 47 passing]
-
-Worktree ready at /Users/jesse/myproject/.worktrees/auth
-Tests passing (47 tests, 0 failures)
-Ready to implement auth feature
-```
-
-## Red Flags
-
-**Never:**
-- Create worktree without verifying it's ignored (project-local)
-- Skip baseline test verification
-- Proceed with failing tests without asking
-- Assume directory location when ambiguous
-- Skip CLAUDE.md check
-
-**Always:**
-- Follow directory priority: existing > CLAUDE.md > ask
-- Verify directory is ignored for project-local
-- Auto-detect and run project setup
-- Verify clean test baseline
-
-## Integration
-
-**Called by:**
-- **brainstorming** (Phase 4) - REQUIRED when design is approved and implementation follows
-- Any skill needing isolated workspace
-
-**Pairs with:**
-- **finishing-a-development-branch** - REQUIRED for cleanup after work complete
-- `/run-agent-session` command - Work happens in this worktree
+1. **Skipping ignore verification** — worktree contents get tracked, pollute git status. Always `git check-ignore` first.
+2. **Assuming directory location** — follow priority: existing > CLAUDE.md > ask.
+3. **Proceeding with failing tests** — can't distinguish new bugs from pre-existing. Report and ask.
+4. **Hardcoding setup commands** — auto-detect from project files instead.

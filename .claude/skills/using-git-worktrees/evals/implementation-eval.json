@@ -1,0 +1,61 @@
+{
+  "skill_name": "using-git-worktrees",
+  "evals": [
+    {
+      "id": 1,
+      "name": "creates-worktree-with-gitignore-check",
+      "prompt": "Create a worktree for the feature/auth-refactor branch in this project.",
+      "expected_output": "Agent checks for existing worktree directory, verifies it's gitignored, creates the worktree, and runs project setup",
+      "assertions": [
+        {"text": "Checks for .worktrees/ or worktrees/ directory", "type": "tool_used", "tool": "Bash", "pattern": "ls.*worktree"},
+        {"text": "Runs git check-ignore", "type": "output_contains", "value": "check-ignore"},
+        {"text": "Creates worktree with git worktree add", "type": "output_contains", "value": "git worktree add"},
+        {"text": "Includes branch name in worktree path", "type": "output_contains_any", "values": ["auth-refactor", "auth_refactor"]}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "adds-gitignore-when-missing",
+      "prompt": "Create a worktree for feature/payments. The .worktrees directory doesn't exist yet and isn't in .gitignore.",
+      "expected_output": "Agent creates the directory, adds it to .gitignore, commits the gitignore change, then creates the worktree",
+      "assertions": [
+        {"text": "Adds to .gitignore", "type": "output_contains_any", "values": [".gitignore", "gitignore"]},
+        {"text": "Commits the gitignore change before creating worktree", "type": "output_contains", "value": "commit"},
+        {"text": "Creates the worktree after gitignore is committed", "type": "output_contains", "value": "worktree add"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "auto-detects-project-setup",
+      "prompt": "Create a worktree for feature/api-v2. After creating it, set up the project dependencies.",
+      "expected_output": "Agent detects the project type from manifest files and runs the appropriate install command",
+      "assertions": [
+        {"text": "Checks for project manifest files", "type": "output_contains_any", "values": ["package.json", "pyproject.toml", "Cargo.toml", "go.mod"]},
+        {"text": "Runs appropriate install command", "type": "output_contains_any", "values": ["npm install", "poetry install", "cargo build", "go mod download", "pip install"]}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "runs-baseline-tests",
+      "prompt": "Create a worktree for feature/cache-layer and verify it has a clean test baseline.",
+      "expected_output": "Agent creates worktree, installs deps, runs tests, and reports the result",
+      "assertions": [
+        {"text": "Runs test suite after setup", "type": "tool_used", "tool": "Bash", "pattern": "test|pytest|jest|vitest|cargo test"},
+        {"text": "Reports test results", "type": "output_contains_any", "values": ["pass", "PASS", "fail", "FAIL", "tests", "specs"]},
+        {"text": "Reports worktree is ready", "type": "output_contains_any", "values": ["ready", "Ready", "worktree ready"]}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "follows-directory-priority",
+      "prompt": "Create a worktree for feature/search. I think there might already be a worktrees directory somewhere in the project.",
+      "expected_output": "Agent checks for existing .worktrees/ then worktrees/ before creating new, and checks CLAUDE.md for preferences",
+      "assertions": [
+        {"text": "Checks .worktrees/ first", "type": "output_contains", "value": ".worktrees"},
+        {"text": "Checks worktrees/ second", "type": "output_contains", "value": "worktrees"},
+        {"text": "Checks CLAUDE.md for preference", "type": "output_contains_any", "values": ["CLAUDE.md", "project preference", "convention"]},
+        {"text": "Uses existing directory if found", "type": "output_contains_any", "values": ["found", "existing", "using", "already"]}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+[
+  {"query": "I have an idea for a notification system that sends alerts via email, SMS, and push. can you help me think through how to build it?", "should_trigger": true},
+  {"query": "what's the best way to approach adding multi-tenancy to our SaaS app? there are a few strategies and I'm not sure which fits our use case", "should_trigger": true},
+  {"query": "let's brainstorm how to restructure our monolith into microservices — I want to explore different decomposition strategies before we commit", "should_trigger": true},
+  {"query": "I want to build a real-time collaboration feature like Google Docs for our editor. help me design the architecture", "should_trigger": true},
+  {"query": "how should we approach caching? we've got a mix of frequently-changing user data and rarely-changing product catalog data, different TTLs make sense", "should_trigger": true},
+  {"query": "I have an idea for a CLI tool that generates boilerplate for our internal services. help me figure out what it should do and how it should work", "should_trigger": true},
+  {"query": "think through this with me: we need an event-driven architecture for order processing but I'm not sure if we need Kafka or if SQS would be enough", "should_trigger": true},
+  {"query": "I want to redesign our auth system — currently we use session cookies but we're adding a mobile app and an API for partners. what are our options?", "should_trigger": true},
+  {"query": "let's design a feature flag system. should we build our own or use LaunchDarkly? what are the trade-offs for our team size?", "should_trigger": true},
+  {"query": "I'm thinking about adding a recommendation engine to our e-commerce site. I need help figuring out the approach before writing any code", "should_trigger": true},
+  {"query": "add a retry mechanism to the API client with exponential backoff, max 3 retries", "should_trigger": false},
+  {"query": "fix the null pointer exception in UserService.getProfile when the user has no avatar", "should_trigger": false},
+  {"query": "create a mermaid sequence diagram showing how the auth flow works", "should_trigger": false},
+  {"query": "set up ESLint and Prettier for our TypeScript project with the airbnb config", "should_trigger": false},
+  {"query": "write unit tests for the OrderService.calculateTotal method covering edge cases", "should_trigger": false},
+  {"query": "create a git worktree for the auth-refactor feature branch", "should_trigger": false},
+  {"query": "review the pull request and check for SQL injection vulnerabilities", "should_trigger": false},
+  {"query": "set up shared skills for my new project using additionalDirectories", "should_trigger": false},
+  {"query": "build a Claude Code plugin with a /deploy command", "should_trigger": false},
+  {"query": "read the README and tell me how to run the development server", "should_trigger": false}
+]

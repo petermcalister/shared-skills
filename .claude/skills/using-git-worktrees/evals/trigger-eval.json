@@ -1,0 +1,22 @@
+[
+  {"query": "I need to work on the auth-refactor feature branch without losing my current work in progress. set up an isolated workspace", "should_trigger": true},
+  {"query": "create a worktree for the new payments feature so I can work on it in parallel with the current branch", "should_trigger": true},
+  {"query": "I want to start implementing the design we just agreed on, but I don't want to mess up my current workspace. can you set up a feature branch?", "should_trigger": true},
+  {"query": "set up an isolated workspace for the database migration work — I need to keep main clean while I experiment", "should_trigger": true},
+  {"query": "I need to work on two branches at once — the hotfix on main and the feature on develop. how do I do that?", "should_trigger": true},
+  {"query": "before we start implementing this plan, let's create a worktree so we don't affect the main working directory", "should_trigger": true},
+  {"query": "set up a feature branch for the API v2 work in an isolated directory", "should_trigger": true},
+  {"query": "I want to test something on a different branch without switching away from my current work", "should_trigger": true},
+  {"query": "create a parallel workspace for the refactoring PR — I want to keep my current changes untouched", "should_trigger": true},
+  {"query": "I need to review a colleague's branch while keeping my local changes. set up a worktree for their branch", "should_trigger": true},
+  {"query": "fix the null pointer exception in UserService.getProfile when the user has no avatar", "should_trigger": false},
+  {"query": "create a mermaid sequence diagram showing the order processing flow", "should_trigger": false},
+  {"query": "add retry logic to the HTTP client with exponential backoff", "should_trigger": false},
+  {"query": "I want to brainstorm how to restructure our monolith into microservices", "should_trigger": false},
+  {"query": "set up shared skills for my new project using additionalDirectories", "should_trigger": false},
+  {"query": "build a Claude Code plugin with a /lint command", "should_trigger": false},
+  {"query": "write integration tests for the OrderService using a real test database", "should_trigger": false},
+  {"query": "help me resolve the merge conflict in src/routes/api.ts", "should_trigger": false},
+  {"query": "review the PR and check for security issues in the authentication code", "should_trigger": false},
+  {"query": "explain how git rebase works and when I should use it vs merge", "should_trigger": false}
+]

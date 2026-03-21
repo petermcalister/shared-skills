@@ -1,0 +1,61 @@
+{
+  "skill_name": "brainstorming",
+  "evals": [
+    {
+      "id": 1,
+      "name": "asks-one-question-at-a-time",
+      "prompt": "I want to build a webhook delivery system that retries failed deliveries. help me design it",
+      "expected_output": "Agent asks a single clarifying question, waits for response, then asks the next one — not a wall of questions",
+      "assertions": [
+        {"text": "First response contains exactly one question", "type": "output_question_count", "max": 1},
+        {"text": "Question is about understanding the idea (purpose, constraints, scale)", "type": "output_contains_any", "values": ["how many", "what kind", "scale", "reliability", "volume", "SLA", "latency"]},
+        {"text": "Does NOT dump multiple questions at once", "type": "output_not_contains", "values": ["1.", "2.", "3.", "First question", "Second question"]}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "proposes-multiple-approaches",
+      "prompt": "I want to add full-text search to our product catalog. we have about 500K products in PostgreSQL. help me think through the options",
+      "expected_output": "Agent proposes 2-3 approaches (e.g., pg_trgm, Elasticsearch, Typesense) with trade-offs and a recommendation",
+      "assertions": [
+        {"text": "Proposes at least 2 approaches", "type": "output_contains_any", "values": ["Option 1", "Option 2", "Approach 1", "Approach 2", "alternatively", "Another approach"]},
+        {"text": "Includes trade-offs for each", "type": "output_contains_any", "values": ["trade-off", "downside", "pro", "con", "however", "but"]},
+        {"text": "Makes a recommendation", "type": "output_contains_any", "values": ["recommend", "suggest", "I'd go with", "best fit", "my recommendation"]}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "presents-design-in-sections",
+      "prompt": "I want to build a job queue system. After exploring: we need Redis-backed, supports retries with backoff, dead letter queue, priority levels, and a dashboard. Present the design.",
+      "expected_output": "Agent presents design in 200-300 word sections, asking for validation after each section before continuing",
+      "assertions": [
+        {"text": "Breaks design into sections", "type": "output_contains_any", "values": ["## ", "### ", "Section", "Part"]},
+        {"text": "Asks for validation after presenting", "type": "output_contains_any", "values": ["look right", "make sense", "thoughts", "feedback", "continue"]},
+        {"text": "Covers architecture", "type": "output_contains_any", "values": ["architecture", "component", "structure", "design"]},
+        {"text": "Doesn't dump the entire design at once", "type": "output_max_length", "max": 2000}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "applies-yagni",
+      "prompt": "I want to build a user settings page. It needs: theme toggle (dark/light), notification preferences, timezone selection, and also maybe in the future we might want custom CSS themes, an API for settings, webhook notifications when settings change, and SSO integration",
+      "expected_output": "Agent identifies the core requirements and pushes back on speculative features (custom CSS, webhooks, SSO) as YAGNI",
+      "assertions": [
+        {"text": "Identifies core features to build", "type": "output_contains_any", "values": ["theme", "notification", "timezone"]},
+        {"text": "Pushes back on speculative features", "type": "output_contains_any", "values": ["YAGNI", "later", "premature", "not needed yet", "future", "defer"]},
+        {"text": "Recommends starting small", "type": "output_contains_any", "values": ["start with", "minimum", "core", "essential", "simplest"]}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "checks-project-context-first",
+      "prompt": "I want to add a caching layer to our API. help me design it",
+      "expected_output": "Agent reads project files (package.json, existing code, CLAUDE.md) before asking questions, to understand the tech stack and existing patterns",
+      "assertions": [
+        {"text": "Reads project files before asking questions", "type": "tool_used", "tool": "Read"},
+        {"text": "References what it found in the project", "type": "output_contains_any", "values": ["I see you're using", "your project", "based on", "looking at", "I notice"]},
+        {"text": "Questions are informed by project context", "type": "output_min_length", "min": 50}
+      ]
+    }
+  ]
+}

@@ -1,54 +1,54 @@
 ---
 name: brainstorming
-description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+description: >
+  Use when the user has an idea that needs design exploration before implementation —
+  when requirements are ambiguous, multiple approaches exist, or the scope isn't clear.
+  Trigger on: "I want to build", "how should we approach", "let's design", "I have an
+  idea for", "what's the best way to", "brainstorm", "think through this with me", or
+  when the user describes a feature at a high level without specifying how to implement it.
+  Do NOT trigger for straightforward implementation tasks where the design is already clear.
+version: 0.1.0
 ---
 
-# Brainstorming Ideas Into Designs
+# Brainstorming — Ideas Into Designs
 
-## Overview
+Turn ambiguous ideas into fully formed designs through collaborative dialogue.
 
-Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
-
-Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design in small sections (200-300 words), checking after each section whether it looks right so far.
+Start by understanding the project context, then ask questions one at a time to refine
+the idea. Once you understand what you're building, present the design in small sections,
+checking after each whether it looks right.
 
 ## The Process
 
-**Understanding the idea:**
-- Check out the current project state first (files, docs, recent commits)
-- Ask questions one at a time to refine the idea
-- Prefer multiple choice questions when possible, but open-ended is fine too
-- Only one question per message - if a topic needs more exploration, break it into multiple questions
-- Focus on understanding: purpose, constraints, success criteria
+**1. Understand the idea:**
+- Check the current project state first (files, docs, recent commits)
+- Ask questions one at a time — don't overwhelm with multiple questions
+- Prefer multiple choice when possible, open-ended when needed
+- Focus on: purpose, constraints, success criteria
 
-**Exploring approaches:**
+**2. Explore approaches:**
 - Propose 2-3 different approaches with trade-offs
-- Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
+- Present conversationally, not as a formal document
 
-**Presenting the design:**
-- Once you believe you understand what you're building, present the design
-- Break it into sections of 200-300 words
-- Ask after each section whether it looks right so far
+**3. Present the design:**
+- Break into sections of 200-300 words
+- Ask after each section: "Does this look right so far?"
 - Cover: architecture, components, data flow, error handling, testing
-- Be ready to go back and clarify if something doesn't make sense
+- Be ready to go back and revise if something doesn't fit
 
 ## After the Design
 
-**Documentation:**
-- Write the validated design to `docs/plans/YYYY-MM-DD-<topic>-design.md`
-- Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document to git
+**Documentation:** Write the validated design to a plan file appropriate for the
+project (e.g., `.claude/plans/<topic>-design.md` or `docs/plans/`).
 
-**Implementation (if continuing):**
-- Ask: "Ready to set up for implementation?"
-- Use superpowers:using-git-worktrees to create isolated workspace
-- Use `/super-plan` to create the implementation plan
+**Implementation:** Ask "Ready to start implementing?" If yes, consider whether
+the work needs an isolated workspace (git worktree) and create an implementation plan.
 
 ## Key Principles
 
-- **One question at a time** - Don't overwhelm with multiple questions
-- **Multiple choice preferred** - Easier to answer than open-ended when possible
-- **YAGNI ruthlessly** - Remove unnecessary features from all designs
-- **Explore alternatives** - Always propose 2-3 approaches before settling
-- **Incremental validation** - Present design in sections, validate each
-- **Be flexible** - Go back and clarify when something doesn't make sense
+- **One question at a time** — don't overwhelm
+- **Multiple choice preferred** — easier to answer than open-ended
+- **YAGNI ruthlessly** — cut features that aren't clearly needed
+- **Explore alternatives** — always propose 2-3 approaches before settling
+- **Incremental validation** — present design in sections, validate each
