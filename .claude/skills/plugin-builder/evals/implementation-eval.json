@@ -1,0 +1,69 @@
+{
+  "skill_name": "plugin-builder",
+  "evals": [
+    {
+      "id": 1,
+      "name": "create-minimal-plugin",
+      "prompt": "Create a minimal Claude Code plugin called 'code-health' with a single /check-health command that runs linting and test coverage checks.",
+      "expected_output": "A plugin directory with correct structure: .claude-plugin/plugin.json + commands/check-health.md",
+      "assertions": [
+        {"text": "plugin.json exists in .claude-plugin/", "type": "file_exists", "pattern": "code-health/.claude-plugin/plugin.json"},
+        {"text": "plugin.json has name field", "type": "content_contains", "value": "\"name\": \"code-health\""},
+        {"text": "Command file exists", "type": "file_exists", "pattern": "code-health/commands/check-health.md"},
+        {"text": "Command has YAML frontmatter with description", "type": "content_contains", "value": "description:"},
+        {"text": "No other files inside .claude-plugin/", "type": "directory_max_files", "path": "code-health/.claude-plugin/", "max": 1}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "plugin-with-skill-and-command",
+      "prompt": "Build a plugin called 'api-docs' with: (1) a skill that auto-triggers when the user asks about API documentation, and (2) a /generate-docs command that explicitly generates OpenAPI docs from code.",
+      "expected_output": "Plugin with both skills/api-docs/SKILL.md and commands/generate-docs.md, plus plugin.json",
+      "assertions": [
+        {"text": "plugin.json exists", "type": "file_exists", "pattern": "api-docs/.claude-plugin/plugin.json"},
+        {"text": "SKILL.md exists in correct path", "type": "file_exists", "pattern": "api-docs/skills/*/SKILL.md"},
+        {"text": "Command exists", "type": "file_exists", "pattern": "api-docs/commands/generate-docs.md"},
+        {"text": "SKILL.md has trigger-focused description", "type": "content_match", "pattern": "description:.*[Uu]se when"},
+        {"text": "Command references the skill via CLAUDE_PLUGIN_ROOT", "type": "content_contains", "value": "CLAUDE_PLUGIN_ROOT"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "add-hook-to-plugin",
+      "prompt": "Add a SessionStart hook to my existing plugin at ./my-plugin/ that runs a setup script when the session begins. The script should check if dependencies are installed.",
+      "expected_output": "hooks/hooks.json created with SessionStart event and a command hook pointing to a setup script",
+      "assertions": [
+        {"text": "hooks.json exists", "type": "file_exists", "pattern": "my-plugin/hooks/hooks.json"},
+        {"text": "Contains SessionStart event", "type": "content_contains", "value": "SessionStart"},
+        {"text": "Hook type is command", "type": "content_contains", "value": "\"type\": \"command\""},
+        {"text": "Uses CLAUDE_PLUGIN_ROOT for script path", "type": "content_contains", "value": "CLAUDE_PLUGIN_ROOT"},
+        {"text": "Valid JSON", "type": "json_valid"}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "add-agent-with-restrictions",
+      "prompt": "Add a read-only code analysis agent to my plugin. It should use haiku for speed, only have Read/Grep/Glob tools, and analyze code quality when asked.",
+      "expected_output": "agents/code-analyzer.md with model: haiku, restricted tools, and clear instructions",
+      "assertions": [
+        {"text": "Agent file exists", "type": "file_exists", "pattern": "*/agents/*.md"},
+        {"text": "Uses haiku model", "type": "content_contains", "value": "haiku"},
+        {"text": "Tools are restricted (no Write/Edit/Bash)", "type": "content_match", "pattern": "tools:.*Read.*Grep.*Glob"},
+        {"text": "Does NOT include Write or Bash in tools", "type": "content_not_contains", "values": ["Write", "Bash", "Edit"]},
+        {"text": "Has description with trigger guidance", "type": "content_contains", "value": "description:"}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "mcp-limitation-awareness",
+      "prompt": "I want to create a plugin that scans Gmail for meeting invites and adds them to Google Calendar. Design the plugin architecture.",
+      "expected_output": "Agent recognizes MCP tools are needed and keeps the workflow in a skill/command (not an agent), documenting the MCP limitation",
+      "assertions": [
+        {"text": "Identifies MCP tools are needed", "type": "output_contains_any", "values": ["MCP", "mcp", "Gmail"]},
+        {"text": "Keeps MCP work in skill/command not agent", "type": "output_contains_any", "values": ["cannot", "not available", "parent session", "skill", "command"]},
+        {"text": "Does not create an agent for MCP work", "type": "output_not_contains", "values": ["agents/gmail-scanner", "delegate to agent"]},
+        {"text": "Documents the limitation", "type": "output_min_length", "min": 100}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+[
+  {"query": "I want to build a Claude Code plugin that adds a /deploy command for pushing our app to staging and production", "should_trigger": true},
+  {"query": "create a new plugin with a skill for automatically reviewing PR diffs and a command to trigger it manually", "should_trigger": true},
+  {"query": "add a SessionStart hook to my plugin that loads context from our project's README on every session", "should_trigger": true},
+  {"query": "I need to add a new agent to my existing plugin that runs code quality checks in an isolated context with read-only tools", "should_trigger": true},
+  {"query": "my plugin's skill isn't being discovered by Claude Code. it's in the skills/ directory but doesn't show up in /skills", "should_trigger": true},
+  {"query": "what's the correct plugin.json format? I keep getting errors when Claude tries to load my plugin", "should_trigger": true},
+  {"query": "add a command to my plugin that lets users run /lint to check code style, and a hook that auto-lints on file save", "should_trigger": true},
+  {"query": "I want to connect my plugin to Slack via MCP so it can post deployment notifications. what goes in .mcp.json?", "should_trigger": true},
+  {"query": "how should I structure a plugin that has 3 skills, 2 commands, and some shared reference docs? what's the best directory layout?", "should_trigger": true},
+  {"query": "package my plugin for distribution — I need to create the .plugin file that others can install", "should_trigger": true},
+  {"query": "create a mermaid sequence diagram showing how our microservices handle order processing", "should_trigger": false},
+  {"query": "write a Python script that parses CSV files and generates summary statistics as JSON", "should_trigger": false},
+  {"query": "set up shared skills for my new project using the additionalDirectories approach", "should_trigger": false},
+  {"query": "fix the React component that's causing an infinite re-render loop in the dashboard", "should_trigger": false},
+  {"query": "I want to create a new skill for database migration safety — help me write it using TDD", "should_trigger": false},
+  {"query": "help me write integration tests for our Express.js API endpoints using supertest", "should_trigger": false},
+  {"query": "review the pull request and check if the SQL queries are safe from injection attacks", "should_trigger": false},
+  {"query": "set up a Docker Compose file with postgres, redis, and our node app for local development", "should_trigger": false},
+  {"query": "run the skill-creator evals on my mermaid-diagram skill to test trigger accuracy", "should_trigger": false},
+  {"query": "explain the difference between OAuth2 PKCE flow and authorization code flow for mobile apps", "should_trigger": false}
+]
