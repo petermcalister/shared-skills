@@ -12,7 +12,7 @@
       "phase": 1,
       "description": "Create shared-skills repo on GitHub + clone locally to ~/RepoBase/shared-skills",
       "acceptance": "gh repo view petermcalister/shared-skills succeeds; local clone exists at ~/RepoBase/shared-skills with README.md and correct directory scaffold",
-      "passes": false
+      "passes": true
     },
     {
       "id": "F002",
@@ -138,14 +138,14 @@
       "phase": 5,
       "description": "Wire git submodule from cowork to shared-skills",
       "acceptance": "cowork/.gitmodules references petermcalister/shared-skills; cowork/.claude/skills/shared/ is a submodule checkout of shared-skills/skills/; git submodule update --init in a fresh clone populates the directory",
-      "passes": false
+      "passes": true
     },
     {
       "id": "F020",
       "phase": 5,
       "description": "Graduate diagram skills from pete-pa to shared-skills (move + symlink or reference update)",
       "acceptance": "Mermaid and Excalidraw skills exist in shared-skills/skills/; pete-pa commands updated to reference skills from shared-skills via submodule path OR skills remain in pete-pa with copies in shared-skills (agent decides based on what works for plugin packaging)",
-      "passes": false
+      "passes": true
     },
     {
       "id": "F021",
@@ -159,7 +159,7 @@
       "phase": 5,
       "description": "Update pete-pa plugin version and CLAUDE.md documentation",
       "acceptance": "pete-pa plugin.json version bumped; CLAUDE.md updated with diagram skills section, shared-skills submodule section; deploy-plugin.sh still produces valid .plugin.zip",
-      "passes": false
+      "passes": true
     }
   ]
 }
