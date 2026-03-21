@@ -10,6 +10,7 @@ python = ">=3.11"
 [tool.poetry.scripts]
 library-status = "tools.library_management.run:status"
 library-setup = "tools.library_management.run:setup"
+library-link = "tools.library_management.run:link"
 library-verify = "tools.library_management.run:verify"
 library-push = "tools.library_management.run:push"
 library-sync = "tools.library_management.run:sync"
