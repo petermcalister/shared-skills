@@ -1,0 +1,66 @@
+{
+  "skill_name": "mermaid-diagram",
+  "evals": [
+    {
+      "id": 1,
+      "name": "flowchart-with-decisions",
+      "prompt": "Create a mermaid flowchart for a user login flow: start -> enter credentials -> validate -> if valid go to dashboard, if invalid show error and retry (max 3 times), if locked out show account locked page",
+      "expected_output": "A .mmd file containing a flowchart with decision diamonds, retry loop, and at least 6 nodes",
+      "assertions": [
+        {"text": "Output contains a .mmd file", "type": "file_exists", "pattern": "*.mmd"},
+        {"text": "Diagram starts with 'flowchart' keyword", "type": "content_contains", "value": "flowchart"},
+        {"text": "Contains decision diamond syntax (curly braces)", "type": "content_contains", "value": "{"},
+        {"text": "Passes mmdc validation without errors", "type": "command_succeeds", "command": "mmdc -i {output_file} -o /tmp/test.png -b transparent"},
+        {"text": "Contains classDef for accessibility styling", "type": "content_contains", "value": "classDef"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "sequence-diagram-api-flow",
+      "prompt": "Draw a mermaid sequence diagram showing: mobile app sends POST /login to API gateway, gateway forwards to auth service, auth service queries user DB, returns JWT, gateway returns token to mobile app. Include activation bars.",
+      "expected_output": "A .mmd file containing a sequenceDiagram with 4 participants and activation",
+      "assertions": [
+        {"text": "Diagram starts with 'sequenceDiagram'", "type": "content_contains", "value": "sequenceDiagram"},
+        {"text": "Has at least 4 participants", "type": "content_match", "pattern": "participant.*\\n.*participant.*\\n.*participant.*\\n.*participant"},
+        {"text": "Uses proper arrow syntax (->>, -->>)", "type": "content_contains", "value": "->>"},
+        {"text": "Contains activation", "type": "content_contains", "value": "activate"},
+        {"text": "Passes mmdc validation", "type": "command_succeeds", "command": "mmdc -i {output_file} -o /tmp/test.png -b transparent"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "er-diagram-with-relationships",
+      "prompt": "Create a mermaid ER diagram for a blog platform: Users have many Posts, Posts have many Comments, Users have many Comments, Posts have many Tags (many-to-many via PostTag). Include key fields for each entity.",
+      "expected_output": "A .mmd file containing an erDiagram with 5 entities and proper cardinality",
+      "assertions": [
+        {"text": "Diagram starts with 'erDiagram'", "type": "content_contains", "value": "erDiagram"},
+        {"text": "Contains cardinality notation", "type": "content_match", "pattern": "\\|\\|--|\\{|\\}o|o\\{"},
+        {"text": "Has at least 4 entity definitions with fields", "type": "content_match", "pattern": "\\{[\\s\\S]*?\\}"},
+        {"text": "Passes mmdc validation", "type": "command_succeeds", "command": "mmdc -i {output_file} -o /tmp/test.png -b transparent"}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "architecture-with-subgraphs",
+      "prompt": "Diagram our architecture: Frontend (React web + React Native mobile) -> API Gateway (Kong) -> Backend Services (Auth, Users, Orders) -> Data Layer (PostgreSQL, Redis, RabbitMQ). Group by layer using subgraphs.",
+      "expected_output": "A .mmd file containing a flowchart with at least 3 subgraphs",
+      "assertions": [
+        {"text": "Uses subgraph for grouping", "type": "content_contains", "value": "subgraph"},
+        {"text": "Has at least 3 subgraphs", "type": "content_match", "pattern": "subgraph.*\\n[\\s\\S]*?end[\\s\\S]*?subgraph.*\\n[\\s\\S]*?end[\\s\\S]*?subgraph"},
+        {"text": "Contains all specified services", "type": "content_contains_all", "values": ["Auth", "Users", "Orders", "PostgreSQL", "Redis"]},
+        {"text": "Passes mmdc validation", "type": "command_succeeds", "command": "mmdc -i {output_file} -o /tmp/test.png -b transparent"}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "validation-error-recovery",
+      "prompt": "Create a mermaid flowchart that includes the word 'end' as a node label and uses special characters in labels like parentheses and quotes. Make sure it validates correctly.",
+      "expected_output": "A .mmd file that properly escapes reserved words and special characters",
+      "assertions": [
+        {"text": "Reserved word 'end' is quoted", "type": "content_match", "pattern": "\"end\"|\"End\""},
+        {"text": "Special characters are escaped or quoted", "type": "content_match", "pattern": "\"[^\"]*[()'\"]"},
+        {"text": "Passes mmdc validation despite tricky content", "type": "command_succeeds", "command": "mmdc -i {output_file} -o /tmp/test.png -b transparent"}
+      ]
+    }
+  ]
+}

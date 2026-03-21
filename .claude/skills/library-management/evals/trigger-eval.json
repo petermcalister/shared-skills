@@ -1,0 +1,22 @@
+[
+  {"query": "I just created a new project at ~/RepoBase/my-new-app and I want it to have access to all the shared skills. set it up for me", "should_trigger": true},
+  {"query": "how do shared skills work? I want to understand the additionalDirectories approach before I start using it", "should_trigger": true},
+  {"query": "my mermaid skill isn't showing up in /skills even though I can see it in the shared-skills repo. what's wrong?", "should_trigger": true},
+  {"query": "connect my job-search project to shared-skills so it can use the diagram skills", "should_trigger": true},
+  {"query": "I want to push the changes I made to the excalidraw skill back to the shared-skills repo", "should_trigger": true},
+  {"query": "we used to use git submodules for shared skills but it kept breaking. can you migrate us to the new approach?", "should_trigger": true},
+  {"query": "list all the skills available in the shared library and tell me what each one does", "should_trigger": true},
+  {"query": "I created a new skill in shared-skills but other projects can't see it. how do I add it properly?", "should_trigger": true},
+  {"query": "sync the shared skills — I think someone pushed updates to the mermaid skill yesterday", "should_trigger": true},
+  {"query": "what settings.json changes do I need to make in my project to use shared skills?", "should_trigger": true},
+  {"query": "create a sequence diagram showing how our API gateway authenticates requests and routes them to microservices", "should_trigger": false},
+  {"query": "draw me an excalidraw architecture diagram of our kubernetes cluster with ingress, services, and pods", "should_trigger": false},
+  {"query": "write a Python function that reads a CSV and outputs aggregated stats as JSON", "should_trigger": false},
+  {"query": "fix the TypeScript compilation error in src/services/auth.ts - it says Property 'token' does not exist on type 'User'", "should_trigger": false},
+  {"query": "set up ESLint and Prettier for our React project with the airbnb config", "should_trigger": false},
+  {"query": "help me write a Dockerfile for our FastAPI app that uses multi-stage builds and runs as non-root", "should_trigger": false},
+  {"query": "review the PR at #42 and check if the database migration is backward compatible", "should_trigger": false},
+  {"query": "create a new Claude Code skill for generating API documentation from OpenAPI specs", "should_trigger": false},
+  {"query": "explain the difference between git rebase and git merge, when should I use each?", "should_trigger": false},
+  {"query": "add pagination to the /api/users endpoint using cursor-based pagination with Prisma", "should_trigger": false}
+]

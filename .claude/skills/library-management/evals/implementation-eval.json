@@ -1,0 +1,68 @@
+{
+  "skill_name": "library-management",
+  "evals": [
+    {
+      "id": 1,
+      "name": "setup-new-project",
+      "prompt": "Set up shared skills for my project at ~/RepoBase/test-project. The project already has a .claude/settings.json with some permissions configured.",
+      "expected_output": "The project's .claude/settings.json is updated with additionalDirectories and SessionStart hook, preserving existing settings",
+      "assertions": [
+        {"text": "settings.json exists at target project", "type": "file_exists", "pattern": "test-project/.claude/settings.json"},
+        {"text": "additionalDirectories contains shared-skills path", "type": "content_contains", "value": "shared-skills"},
+        {"text": "SessionStart hook is configured", "type": "content_contains", "value": "SessionStart"},
+        {"text": "Existing permissions are preserved (not overwritten)", "type": "content_contains", "value": "allow"},
+        {"text": "Hook points to verify script", "type": "content_contains", "value": "verify-shared-skills.sh"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "list-available-skills",
+      "prompt": "What shared skills are available? List them all with their descriptions.",
+      "expected_output": "A list of all skills in the shared library with names and trigger descriptions",
+      "assertions": [
+        {"text": "Lists mermaid-diagram", "type": "output_contains", "value": "mermaid-diagram"},
+        {"text": "Lists excalidraw-diagram", "type": "output_contains", "value": "excalidraw-diagram"},
+        {"text": "Lists library-management", "type": "output_contains", "value": "library-management"},
+        {"text": "Lists skill-creator", "type": "output_contains", "value": "skill-creator"},
+        {"text": "Includes descriptions (not just names)", "type": "output_min_length", "min": 200}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "diagnose-missing-skill",
+      "prompt": "I added shared-skills to my project but the mermaid skill doesn't show up in /skills. Help me figure out why.",
+      "expected_output": "Agent checks additionalDirectories config, verifies paths, runs verification script, and identifies the issue",
+      "assertions": [
+        {"text": "Checks settings.json for additionalDirectories", "type": "tool_used", "tool": "Read", "target": "settings.json"},
+        {"text": "Suggests running library-verify or the verification script", "type": "output_contains_any", "values": ["library-verify", "verify-shared-skills"]},
+        {"text": "Mentions checking path is absolute", "type": "output_contains", "value": "absolute"},
+        {"text": "Mentions SKILL.md must be one level deep", "type": "output_contains_any", "values": ["one level", "exactly one"]}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "remove-submodule-migration",
+      "prompt": "My cowork project still uses a git submodule for shared-skills at .claude/skills/shared. Migrate it to the additionalDirectories approach.",
+      "expected_output": "Agent removes the submodule, adds additionalDirectories, removes duplicate skills, adds verification hook",
+      "assertions": [
+        {"text": "Runs git submodule deinit", "type": "output_contains", "value": "submodule deinit"},
+        {"text": "Runs git rm on the submodule path", "type": "output_contains", "value": "git rm"},
+        {"text": "Adds additionalDirectories to settings.json", "type": "output_contains", "value": "additionalDirectories"},
+        {"text": "Mentions removing duplicate skills", "type": "output_contains_any", "values": ["duplicate", "remove", "already exists"]}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "add-new-skill-to-library",
+      "prompt": "I want to add a new skill called 'api-docs' to the shared library. It should trigger when users ask to generate API documentation from code or OpenAPI specs.",
+      "expected_output": "Creates .claude/skills/api-docs/SKILL.md with proper frontmatter in the shared-skills repo",
+      "assertions": [
+        {"text": "Creates SKILL.md in correct path", "type": "file_exists", "pattern": ".claude/skills/api-docs/SKILL.md"},
+        {"text": "Has YAML frontmatter with name", "type": "content_contains", "value": "name: api-docs"},
+        {"text": "Has description in frontmatter", "type": "content_contains", "value": "description:"},
+        {"text": "Has version in frontmatter", "type": "content_contains", "value": "version:"},
+        {"text": "Description is trigger-focused (mentions when to use)", "type": "content_match", "pattern": "trigger|Use this|Use when"}
+      ]
+    }
+  ]
+}

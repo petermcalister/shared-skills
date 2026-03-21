@@ -1,115 +1,84 @@
 ---
 name: mermaid-diagram
 description: >
-  Create Mermaid diagrams (activity, deployment, sequence, architecture, flowchart, ER, class,
-  state, gantt, mindmap) from text descriptions or source code. Use when asked to "create a diagram",
-  "generate mermaid", "document architecture", "code to diagram", "visualize workflow",
-  "create design doc", "convert code to diagram", or any request involving technical diagrams.
-  Supports hierarchical on-demand guide loading, Unicode semantic symbols, and Python utilities
-  for diagram extraction, validation, and image conversion.
-version: 0.1.0
+  Use this skill ANY time the user wants a diagram, chart, or visual documentation of any kind —
+  flowcharts, sequence diagrams, architecture diagrams, ER diagrams, state machines, gantt charts,
+  class diagrams, deployment diagrams, mindmaps, or any visual representation of systems, processes,
+  or relationships. Trigger on: "diagram", "chart", "visualize", "draw", "map out", "document the
+  flow", "show how X connects to Y", or when the user describes states, transitions, timelines, or
+  service interactions that imply a visual even without saying "diagram". Also trigger when the user
+  mentions "mermaid" by name or asks to convert code to a diagram.
+version: 0.2.0
 ---
 
-# Mermaid Architect — Hierarchical Diagram Skill
+# Mermaid Diagram Skill
 
-Mermaid diagram system with specialized guides, resilient validation, and code-to-diagram capabilities.
+Generate validated Mermaid diagrams from text descriptions or source code.
 
-## Decision Tree
+## How This Skill Works
 
-1. **User makes a request** → Analyze intent
-2. **Determine diagram/document type** → Load appropriate guide(s)
-3. **Generate diagram** using guide patterns
-4. **Validate via resilient workflow** → NEVER deliver unvalidated diagrams
+1. **Determine diagram type** from the user's request
+2. **Load the relevant guide** for that type (only what's needed — saves context)
+3. **Generate the .mmd file**
+4. **Validate via mmdc** — diagrams with syntax errors are useless to the user
+5. **Deliver** the validated .mmd and rendered PNG/SVG
 
-### Intent Routing
+## Intent Routing
 
-| User says... | Load guide |
-|-------------|-----------|
-| "workflow", "process", "business logic", "user flow" | `.claude/skills/mermaid-diagram/references/guides/diagrams/activity-diagrams.md` |
-| "infrastructure", "deployment", "cloud", "K8s" | `.claude/skills/mermaid-diagram/references/guides/diagrams/deployment-diagrams.md` |
-| "system architecture", "components", "microservices" | `.claude/skills/mermaid-diagram/references/guides/diagrams/architecture-diagrams.md` |
-| "API flow", "interactions", "sequence" | `.claude/skills/mermaid-diagram/references/guides/diagrams/sequence-diagrams.md` |
-| General diagram or unsure | `.claude/skills/mermaid-diagram/references/mermaid-diagram-guide.md` |
+Read only the guide you need for this request:
 
-For troubleshooting syntax errors, read: `.claude/skills/mermaid-diagram/references/guides/troubleshooting.md`
+| User's intent | Guide to read |
+|---------------|---------------|
+| Workflow, process, business logic | `references/guides/diagrams/activity-diagrams.md` |
+| Infrastructure, deployment, cloud, K8s | `references/guides/diagrams/deployment-diagrams.md` |
+| System architecture, components, microservices | `references/guides/diagrams/architecture-diagrams.md` |
+| API flow, service interactions, sequence | `references/guides/diagrams/sequence-diagrams.md` |
+| General or unsure which type | `references/mermaid-diagram-guide.md` |
 
-## Resilient Workflow (MANDATORY)
+All paths are relative to this skill's directory.
 
-**NEVER add a diagram to markdown until it passes validation.**
+## Validation Workflow
 
-```
-1. Identify diagram type → Load appropriate guide
-2. Write .mmd file with naming convention
-3. Validate via mmdc:
-   python .claude/skills/mermaid-diagram/scripts/validate_mermaid.py \
-     --code "$(cat diagram.mmd)" --output diagram.png --json
-4. IF success → Deliver diagram
-   IF error → Read troubleshooting.md → Fix syntax → Retry (max 3 attempts)
-```
-
-### Quick Validation Commands
+Unvalidated Mermaid diagrams frequently contain syntax errors — broken arrows, reserved word collisions, unescaped characters — that make them useless. Always validate before delivering.
 
 ```bash
-# Validate a single .mmd file
+# Option 1: Use the resilient workflow script
+python scripts/validate_mermaid.py --code "$(cat diagram.mmd)" --output diagram.png --json
+
+# Option 2: Direct mmdc validation
 mmdc -i diagram.mmd -o diagram.png -b transparent
-
-# Extract and validate all diagrams in a markdown file
-python .claude/skills/mermaid-diagram/scripts/extract_mermaid.py doc.md --validate
-
-# Batch convert all .mmd files to PNG
-python .claude/skills/mermaid-diagram/scripts/mermaid_to_image.py diagrams/ output/ --format png
 ```
 
-### File Naming Convention
+If validation fails, read `references/guides/troubleshooting.md` — it catalogs 28 common errors with fixes. Apply the fix and retry (up to 3 attempts).
+
+## File Naming
 
 ```
 ./diagrams/<context>_<num>_<type>_<title>.mmd
-./diagrams/<context>_<num>_<type>_<title>.png
 ```
 
 Example: `./diagrams/api_design_01_sequence_auth_flow.mmd`
 
-## High-Contrast Styling (Required)
+## Styling
 
-Always add high-contrast classDef styles for accessibility:
+Apply high-contrast styles for accessibility. Read `references/mermaid-diagram-guide.md` for the classDef templates.
 
-```mermaid
-%% High-contrast styles
-classDef default fill:#E8F4FD,stroke:#1B4F72,stroke-width:2px,color:#1B4F72
-classDef highlight fill:#D4EFDF,stroke:#1E8449,stroke-width:2px,color:#1E8449
-classDef warning fill:#FDEBD0,stroke:#B9770E,stroke-width:2px,color:#B9770E
-classDef error fill:#FADBD8,stroke:#C0392B,stroke-width:2px,color:#C0392B
-classDef info fill:#D6EAF8,stroke:#2471A3,stroke-width:2px,color:#2471A3
-```
+## Unicode Symbols
 
-## Unicode Semantic Symbols (Quick Reference)
+Enhance clarity with semantic symbols (e.g., `🔐 Auth`, `💾 Database`, `📨 Queue`). Full catalog: `references/guides/unicode-symbols/guide.md`
 
-Enhance diagram clarity with Unicode symbols:
+## Scripts
 
-| Category | Symbols |
-|----------|---------|
-| Infrastructure | ☁️ 🌐 🔌 📡 🗄️ |
-| Compute | ⚙️ ⚡ 🔄 ♻️ 🚀 |
-| Data | 💾 📦 📊 📈 🗃️ |
-| Security | 🔐 🔑 🛡️ 🚪 👤 |
-| Monitoring | 📝 📊 🚨 ⚠️ ✅ ❌ |
+| Script | When to use |
+|--------|-------------|
+| `scripts/validate_mermaid.py` | Validate + render with error recovery (`--json` for structured output) |
+| `scripts/extract_mermaid.py` | Extract diagrams from existing markdown (`--validate`, `--list-only`) |
+| `scripts/mermaid_to_image.py` | Batch render .mmd files to PNG/SVG (`--theme`, `--format`) |
 
-Full reference: `.claude/skills/mermaid-diagram/references/guides/unicode-symbols/guide.md`
+## Quick Tips
 
-## Python Utilities
-
-| Script | Purpose |
-|--------|---------|
-| `scripts/extract_mermaid.py` | Extract diagrams from markdown, validate, replace with images |
-| `scripts/mermaid_to_image.py` | Convert .mmd to PNG/SVG with themes and batch support |
-| `scripts/validate_mermaid.py` | Resilient workflow: validate, render, error recovery |
-
-## Best Practices
-
-1. **Wrap labels in quotes** when they contain special characters or reserved words
-2. **Use `flowchart` not `graph`** for modern Mermaid syntax
-3. **Avoid reserved word `end`** as a node name — use `"end"` instead
-4. **Add `classDef` styles** for every diagram (accessibility)
-5. **Validate before delivering** — always run mmdc
-6. **Use subgraphs** to group related nodes in complex diagrams
-7. **Keep diagrams focused** — split large diagrams into multiple smaller ones
+- Use `flowchart` not `graph` (modern syntax)
+- Wrap labels containing special characters or reserved words in quotes
+- The word `end` is reserved — use `"end"` in labels
+- Use subgraphs to group related nodes in complex diagrams
+- Split very large diagrams into multiple focused diagrams
