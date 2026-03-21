@@ -152,7 +152,7 @@
       "phase": 5,
       "description": "Run skill-creator eval on both diagram skills as validation",
       "acceptance": "run_eval.py executed against mermaid-diagram and excalidraw-diagram skills; trigger queries tested (at least 8 should-trigger, 8 should-not per skill); both skills achieve >80% trigger accuracy; eval results saved to shared-skills/evals/results/",
-      "passes": false
+      "passes": true
     },
     {
       "id": "F022",

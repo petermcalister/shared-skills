@@ -1,0 +1,22 @@
+[
+  {"query": "can you create a sequence diagram showing how our auth service talks to the user DB and issues JWTs? the flow starts from the React frontend", "should_trigger": true},
+  {"query": "I need to document the architecture of our microservices - we've got 4 services behind a Kong API gateway, draw me a mermaid diagram", "should_trigger": true},
+  {"query": "generate a flowchart for our deployment pipeline, it goes: PR merge -> GitHub Actions -> build Docker -> push to ECR -> deploy to EKS", "should_trigger": true},
+  {"query": "draw an ER diagram for our ecommerce database - users, orders, products, line_items with the relationships", "should_trigger": true},
+  {"query": "visualize the state machine for an order: created -> paid -> shipped -> delivered, with cancelled branching from created and paid", "should_trigger": true},
+  {"query": "make a gantt chart for our Q2 roadmap - design phase 2 weeks, backend 4 weeks, frontend 3 weeks, testing 2 weeks, launch 1 week", "should_trigger": true},
+  {"query": "i want a mermaid diagram showing the data flow from our kafka topics through the processing pipeline to the data warehouse", "should_trigger": true},
+  {"query": "create a class diagram for the payment module - PaymentProcessor, CreditCardPayment, PayPalPayment implementing IPayment interface", "should_trigger": true},
+  {"query": "can you diagram how our CI/CD works? we use GitHub Actions with matrix builds, the whole thing deploys to 3 environments", "should_trigger": true},
+  {"query": "document the API interaction between our mobile app and the backend - show the login, token refresh, and data sync flows as a sequence diagram", "should_trigger": true},
+  {"query": "read the file at src/utils/helpers.ts and tell me what the formatDate function does", "should_trigger": false},
+  {"query": "write a Python script that parses CSV files and outputs JSON, handle missing values gracefully", "should_trigger": false},
+  {"query": "fix the bug in my React component - the useEffect is running on every render instead of just on mount", "should_trigger": false},
+  {"query": "set up a new Express.js API with TypeScript, include health check and CORS middleware", "should_trigger": false},
+  {"query": "review this PR and tell me if there are any security issues with the SQL queries", "should_trigger": false},
+  {"query": "help me write unit tests for the UserService class using Jest and mock the database calls", "should_trigger": false},
+  {"query": "refactor this 200-line function into smaller functions, it handles user registration with validation and email sending", "should_trigger": false},
+  {"query": "I need to add pagination to our REST API endpoints, we're using Fastify with Prisma ORM", "should_trigger": false},
+  {"query": "explain the difference between OAuth2 authorization code flow and implicit flow, when should I use each?", "should_trigger": false},
+  {"query": "create a Docker compose file for local development with postgres, redis, and our node app", "should_trigger": false}
+]
