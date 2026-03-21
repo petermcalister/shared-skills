@@ -1,0 +1,65 @@
+{
+  "skill_name": "systematic-debugging",
+  "evals": [
+    {
+      "id": 1,
+      "name": "investigates-before-fixing",
+      "prompt": "The /api/users endpoint returns 500 with 'Cannot read properties of undefined (reading map)'. Fix it.",
+      "expected_output": "Agent reads the error, finds the file, traces the data flow to identify WHERE the undefined value comes from — does NOT propose a fix before understanding the root cause",
+      "assertions": [
+        {"text": "Reads the error message carefully", "type": "output_contains_any", "values": ["undefined", "map", "Cannot read"]},
+        {"text": "Reads the source file before proposing fix", "type": "tool_used", "tool": "Read"},
+        {"text": "Traces the data flow (checks what calls this function)", "type": "output_contains_any", "values": ["called by", "passed from", "where does", "trace", "originates"]},
+        {"text": "Does NOT propose a fix in the first response", "type": "output_not_contains", "values": ["fix:", "solution:", "change it to", "replace with"]},
+        {"text": "States a hypothesis before fixing", "type": "output_contains_any", "values": ["because", "root cause", "the issue is", "this happens when"]}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "checks-recent-changes",
+      "prompt": "The login page stopped working after today's deployment. Users get a blank white page. It was fine yesterday.",
+      "expected_output": "Agent checks git log for recent changes, identifies what changed between yesterday and today, correlates changes with the symptom",
+      "assertions": [
+        {"text": "Checks git log or recent commits", "type": "tool_used", "tool": "Bash", "pattern": "git log|git diff|git show"},
+        {"text": "Identifies what changed recently", "type": "output_contains_any", "values": ["changed", "commit", "modified", "updated", "deployed"]},
+        {"text": "Correlates changes with the symptom", "type": "output_contains_any", "values": ["blank page", "render", "build", "bundle", "import"]},
+        {"text": "Doesn't immediately propose a rollback without understanding", "type": "output_not_contains", "values": ["just rollback", "revert everything"]}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "reproduces-before-fixing",
+      "prompt": "Users report that the search feature 'sometimes returns wrong results'. I can't figure out when it fails. Help me debug it.",
+      "expected_output": "Agent tries to reproduce consistently — asks about specific inputs, checks for pattern (timing, data, user), doesn't guess at a fix",
+      "assertions": [
+        {"text": "Asks about reproduction steps", "type": "output_contains_any", "values": ["reproduce", "which search", "what query", "specific", "example", "when does"]},
+        {"text": "Looks for patterns", "type": "output_contains_any", "values": ["pattern", "every time", "consistently", "intermittent", "sometimes"]},
+        {"text": "Doesn't guess at a fix without reproduction", "type": "output_not_contains", "values": ["try changing", "probably", "just add", "quick fix"]}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "single-hypothesis-minimal-change",
+      "prompt": "I found the bug: the date parsing function crashes on dates formatted as DD/MM/YYYY but works for MM/DD/YYYY. The function uses new Date(input). Fix it.",
+      "expected_output": "Agent forms a clear hypothesis (Date constructor interprets DD/MM as MM/DD), makes ONE minimal change to fix the parsing, doesn't refactor the entire date handling system",
+      "assertions": [
+        {"text": "States the hypothesis clearly", "type": "output_contains_any", "values": ["Date constructor", "interprets", "parsing", "format"]},
+        {"text": "Makes a single minimal fix", "type": "output_contains_any", "values": ["split", "parse", "format", "DD/MM"]},
+        {"text": "Does NOT over-engineer (no date library, no rewrite)", "type": "output_not_contains", "values": ["moment", "date-fns", "luxon", "complete rewrite", "refactor all"]},
+        {"text": "Suggests verifying the fix with a test", "type": "output_contains_any", "values": ["test", "verify", "confirm", "check"]}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "stops-after-three-failed-fixes",
+      "prompt": "I've already tried 3 things to fix this flaky test: (1) added a sleep, (2) increased the timeout, (3) wrapped it in a retry loop. None worked — it still fails about 10% of the time. What should I try next?",
+      "expected_output": "Agent recognizes the 3-fix threshold, questions whether the approach/architecture is wrong instead of proposing fix #4, suggests investigating the root cause of the flakiness",
+      "assertions": [
+        {"text": "Recognizes the pattern of repeated failed fixes", "type": "output_contains_any", "values": ["three", "3", "multiple", "pattern", "not working"]},
+        {"text": "Questions the architecture/approach", "type": "output_contains_any", "values": ["architectural", "fundamentally", "root cause", "underlying", "approach", "race condition"]},
+        {"text": "Does NOT propose another band-aid fix", "type": "output_not_contains", "values": ["try adding", "increase to", "add another retry", "longer timeout"]},
+        {"text": "Suggests going back to investigation", "type": "output_contains_any", "values": ["investigate", "understand why", "trace", "what's actually happening", "root cause"]}
+      ]
+    }
+  ]
+}

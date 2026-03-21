@@ -1,0 +1,22 @@
+[
+  {"query": "I want to create a new skill that helps Claude generate API documentation from OpenAPI specs. help me build it from scratch", "should_trigger": true},
+  {"query": "my code-review skill isn't triggering often enough. can you optimize the description for better trigger accuracy?", "should_trigger": true},
+  {"query": "run evals on the mermaid-diagram skill to see how well it triggers and whether the outputs are correct", "should_trigger": true},
+  {"query": "I want to benchmark my deployment skill against the previous version to see if the rewrite actually improved things", "should_trigger": true},
+  {"query": "the excalidraw skill needs improvement — let's run test cases, review the results, and iterate until it's better", "should_trigger": true},
+  {"query": "help me write a skill description that triggers correctly for database migration tasks without false-triggering on general SQL questions", "should_trigger": true},
+  {"query": "I have a rough draft of a skill for generating changelogs. can you help me test it and improve it through the eval loop?", "should_trigger": true},
+  {"query": "package my finished skill into a .skill file so I can share it with others", "should_trigger": true},
+  {"query": "run the A/B comparison between variant A and variant B of my testing skill to see which version produces better output", "should_trigger": true},
+  {"query": "I want to turn the workflow we just used into a reusable skill. capture the intent and help me formalize it", "should_trigger": true},
+  {"query": "create a mermaid sequence diagram showing how our auth service validates JWT tokens", "should_trigger": false},
+  {"query": "fix the null pointer exception in UserService.getProfile when the user has no avatar set", "should_trigger": false},
+  {"query": "set up shared skills for my new project using the additionalDirectories approach", "should_trigger": false},
+  {"query": "build a Claude Code plugin with a /deploy command and a SessionStart hook", "should_trigger": false},
+  {"query": "add retry logic to the HTTP client with exponential backoff and circuit breaker", "should_trigger": false},
+  {"query": "I have an idea for a notification system — help me brainstorm the architecture before coding", "should_trigger": false},
+  {"query": "create a git worktree for the feature/auth-refactor branch so I can work in isolation", "should_trigger": false},
+  {"query": "the CI pipeline is failing with a timeout error in the integration tests. help me debug it", "should_trigger": false},
+  {"query": "write unit tests for the OrderService.calculateTotal method covering edge cases", "should_trigger": false},
+  {"query": "draw an excalidraw architecture diagram of our microservices with evidence artifacts", "should_trigger": false}
+]

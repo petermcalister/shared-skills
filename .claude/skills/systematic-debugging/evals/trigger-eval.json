@@ -1,0 +1,22 @@
+[
+  {"query": "the tests are failing with 'TypeError: Cannot read property of undefined' in the UserService but I can't figure out why — it worked yesterday", "should_trigger": true},
+  {"query": "our API returns 500 errors intermittently in production. sometimes it works, sometimes it doesn't. help me figure out what's going on", "should_trigger": true},
+  {"query": "the build is broken after merging the auth PR — getting compilation errors in 3 different files and I'm not sure which change caused it", "should_trigger": true},
+  {"query": "I've tried 3 different fixes for this race condition and none of them work. the test still fails about 20% of the time", "should_trigger": true},
+  {"query": "there's a bug where the order total is calculated incorrectly when a discount code is applied to items that are already on sale", "should_trigger": true},
+  {"query": "performance has degraded — the /api/products endpoint used to respond in 50ms and now it's taking 3 seconds. nothing obvious changed", "should_trigger": true},
+  {"query": "the CI pipeline passes locally but fails in GitHub Actions with a timeout on the integration tests. same code, different result", "should_trigger": true},
+  {"query": "users are reporting that the password reset email link expires before they can click it, but the token TTL is set to 24 hours", "should_trigger": true},
+  {"query": "after upgrading to Node 20, some of our stream processing tests hang indefinitely. they were fine on Node 18", "should_trigger": true},
+  {"query": "the webhook delivery system is losing events — we send 100 but the receiver only gets 85-90. no errors in the logs", "should_trigger": true},
+  {"query": "create a mermaid sequence diagram showing how our auth service validates JWT tokens", "should_trigger": false},
+  {"query": "add a retry mechanism to the API client with exponential backoff", "should_trigger": false},
+  {"query": "I want to build a notification system — help me brainstorm the architecture", "should_trigger": false},
+  {"query": "create a new skill for generating API docs from OpenAPI specs", "should_trigger": false},
+  {"query": "set up shared skills for my new project using additionalDirectories", "should_trigger": false},
+  {"query": "build a Claude Code plugin with a /deploy command", "should_trigger": false},
+  {"query": "create a git worktree for the feature/auth-refactor branch", "should_trigger": false},
+  {"query": "write unit tests for the PaymentService.processRefund method", "should_trigger": false},
+  {"query": "refactor this 300-line function into smaller service methods", "should_trigger": false},
+  {"query": "explain how OAuth2 PKCE flow works for mobile apps", "should_trigger": false}
+]

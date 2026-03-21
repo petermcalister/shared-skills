@@ -1,0 +1,68 @@
+{
+  "skill_name": "skill-creator",
+  "evals": [
+    {
+      "id": 1,
+      "name": "capture-intent-and-interview",
+      "prompt": "I want to create a skill that helps generate database migration scripts safely. It should check for destructive operations and suggest rollback plans.",
+      "expected_output": "Agent asks clarifying questions to narrow the scope before writing anything — what DB engine, what ORM, what safety checks matter most, example scenarios",
+      "assertions": [
+        {"text": "Asks clarifying questions before writing SKILL.md", "type": "output_contains_any", "values": ["which database", "what ORM", "what kind of migrations", "example", "scenario"]},
+        {"text": "Does NOT immediately write a SKILL.md", "type": "tool_not_used_before_output", "tool": "Write"},
+        {"text": "Explores edge cases", "type": "output_contains_any", "values": ["destructive", "rollback", "down migration", "data loss", "breaking change"]},
+        {"text": "Asks about triggering conditions", "type": "output_contains_any", "values": ["trigger", "when should", "what phrases", "when to use"]}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "writes-well-structured-skill",
+      "prompt": "Based on our discussion: the skill is for PostgreSQL migrations using Prisma. It should check for destructive column drops, suggest rollback scripts, and warn about data-dependent migrations. Write the SKILL.md.",
+      "expected_output": "A SKILL.md with proper frontmatter (name, description, version), trigger-focused description, imperative instructions, under 500 lines",
+      "assertions": [
+        {"text": "Creates SKILL.md file", "type": "file_exists", "pattern": "*/SKILL.md"},
+        {"text": "Has name in frontmatter", "type": "content_contains", "value": "name:"},
+        {"text": "Description starts with Use when", "type": "content_match", "pattern": "description:.*[Uu]se when"},
+        {"text": "Has version field", "type": "content_contains", "value": "version:"},
+        {"text": "Under 500 lines", "type": "file_max_lines", "max": 500},
+        {"text": "Uses imperative form", "type": "content_contains_any", "values": ["Check ", "Run ", "Verify ", "Read "]}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "creates-test-cases",
+      "prompt": "Let's test the migration safety skill. Create test cases — realistic prompts that should and shouldn't trigger it.",
+      "expected_output": "An evals JSON file with 10+ queries mixing should-trigger and should-not-trigger, realistic and detailed per skill-creator guidelines",
+      "assertions": [
+        {"text": "Creates eval JSON file", "type": "file_exists", "pattern": "*eval*.json"},
+        {"text": "Has at least 10 queries", "type": "json_array_min_length", "path": "", "min": 10},
+        {"text": "Mix of should_trigger true and false", "type": "content_contains_all", "values": ["\"should_trigger\": true", "\"should_trigger\": false"]},
+        {"text": "Queries are realistic (contain specific details)", "type": "content_match", "pattern": "column|migration|schema|table|ALTER|DROP"},
+        {"text": "Negative cases are near-misses not obviously irrelevant", "type": "content_not_contains", "values": ["fibonacci", "hello world", "what is 2+2"]}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "runs-eval-and-reports",
+      "prompt": "Run the trigger evals on the migration-safety skill and show me the results.",
+      "expected_output": "Agent runs run_eval.py with proper arguments, reports pass/fail rates, identifies which queries failed",
+      "assertions": [
+        {"text": "Runs the eval script", "type": "tool_used", "tool": "Bash", "pattern": "run_eval"},
+        {"text": "Reports pass rate", "type": "output_contains_any", "values": ["passed", "pass rate", "/20", "/10"]},
+        {"text": "Shows individual query results", "type": "output_contains_any", "values": ["PASS", "FAIL", "trigger_rate"]},
+        {"text": "Identifies failing queries for improvement", "type": "output_min_length", "min": 200}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "iterates-based-on-feedback",
+      "prompt": "The eval results show the skill doesn't trigger for 'add a new column to the users table' but does trigger for 'write a SQL query'. Fix the description.",
+      "expected_output": "Agent analyzes the failures, identifies description gaps, rewrites the description to catch migration-related queries without false-triggering on general SQL",
+      "assertions": [
+        {"text": "Analyzes the failure pattern", "type": "output_contains_any", "values": ["column", "migration", "doesn't trigger", "false positive"]},
+        {"text": "Rewrites the description", "type": "tool_used", "tool": "Edit"},
+        {"text": "New description addresses the gap", "type": "content_contains_any", "values": ["add column", "alter table", "schema change", "migration"]},
+        {"text": "Suggests re-running evals to verify", "type": "output_contains_any", "values": ["rerun", "re-run", "test again", "verify"]}
+      ]
+    }
+  ]
+}
