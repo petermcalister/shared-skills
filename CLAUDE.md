@@ -8,13 +8,19 @@ This repo contains **shared reusable Claude Code skills, commands, and CLI tools
 
 ## How Sharing Works
 
+Three types of content are shared: **skills**, **agents**, and **commands**.
+
 Consumer projects connect via two mechanisms:
-- **Symlinks** in `.claude/skills/` point to skills here (handles discovery)
+- **Symlinks/junctions** in `.claude/skills/`, `.claude/agents/`, `.claude/commands/` point here (handles discovery)
 - **`additionalDirectories`** in `.claude/settings.json` grants file access (handles references, scripts)
 
 Both are set up automatically by `library-setup <project-dir>`.
 
-Edits to symlinked skills write directly to this repo. Push with `library-push` or `/push-skills`.
+On Windows, `os.symlink()` requires elevation. The tools automatically fall back to:
+- **Directory junctions** for skills (write-through, no elevation needed)
+- **Hardlinks** for agents/commands (write-through, no elevation needed)
+
+All shared content writes through to this repo from any consumer project. Push with `library-push` or `/push-skills`.
 
 ## Skills
 
@@ -32,15 +38,44 @@ All skills live at `.claude/skills/<name>/SKILL.md` with YAML frontmatter (`name
 | `plugin-builder` | Build Claude Code plugins |
 | `library-management` | Set up and maintain the shared library |
 
-## CLI Tools
+## Shared Agents
 
-Registered in `pyproject.toml`. Install with `poetry install`.
+Agents live at `.claude/agents/<name>.md`.
+
+| Agent | Purpose |
+|-------|---------|
+| `reviewer` | Review code changes for production readiness |
+| `run-agent` | Execute plan-n-park task batches |
+
+## Shared Commands
+
+Commands live at `.claude/commands/<name>.md`.
 
 | Command | Purpose |
 |---------|---------|
-| `library-setup <dir>` | Full setup: settings.json + hook + symlinks |
+| `/checkin` | Git add, commit, and push with concise summary |
+| `/plan-n-park` | Create implementation plan for multi-session work |
+| `/push-skills` | Commit + push shared-skills from consumer project |
+| `/reflect` | Distill and preserve learnings from session |
+| `/run-agent` | Execute a plan-n-park |
+| `/sync-all` | Pull latest shared skills + list available |
+
+## CLI Tools
+
+Registered in `pyproject.toml` as entry points. Install once as an editable package:
+
+```bash
+pip install -e ~/RepoBase/shared-skills
+```
+
+This makes all `library-*` commands globally available. Required before `library-setup` can be used on consumer projects.
+
+| Command | Purpose |
+|---------|---------|
+| `library-setup <dir>` | Full setup: settings.json + hook + symlinks/junctions |
 | `library-link [dir]` | Create/refresh symlinks (idempotent) |
-| `library-status` | Repo status + skill inventory |
+| `library-link [dir] --repair` | Replace stale plain copies with proper links |
+| `library-status` | Repo status + skill/agent/command inventory |
 | `library-list` | List skills with descriptions |
 | `library-push ["msg"]` | Commit + push this repo |
 | `library-sync` | Git pull + refresh symlinks |
@@ -62,4 +97,10 @@ Registered in `pyproject.toml`. Install with `poetry install`.
 
 Currently: `cowork`, `EmailEvidenceLocker` (both under `~/RepoBase/`).
 
-To add a new consumer: `library-setup ~/RepoBase/new-project`
+To add a new consumer:
+
+```bash
+library-setup ~/RepoBase/new-project
+```
+
+Then add a "Shared Skills Library" section to the new project's CLAUDE.md — see the library-management skill for the template.

@@ -125,24 +125,27 @@ def _create_junction(link_path: Path, target_path: Path):
     )
 
 
-def _sync_location(project_dir: Path, location: str) -> dict:
+def _sync_location(project_dir: Path, location: str, repair: bool = False) -> dict:
     """Sync symlinks/junctions for a single shared content location.
 
-    Returns dict with created, existing, removed, and errors lists.
+    Returns dict with created, existing, removed, repaired, and errors lists.
     On Windows, uses directory junctions (no elevation required) for
     directories and file copies for files, falling back from os.symlink().
+
+    If repair=True, plain directories/files that match shared items are
+    replaced with proper symlinks/junctions/copies.
     """
     loc = SHARED_LOCATIONS[location]
     shared_path = loc["shared"]
     target_dir = project_dir / loc["local"]
 
     if not shared_path.exists():
-        return {"created": [], "existing": [], "removed": [], "errors": []}
+        return {"created": [], "existing": [], "removed": [], "repaired": [], "errors": []}
 
     target_dir.mkdir(parents=True, exist_ok=True)
 
     shared_items = _find_shared_items(location)
-    created, existing, removed, errors = [], [], [], []
+    created, existing, removed, repaired, errors = [], [], [], [], []
 
     for item_name in sorted(shared_items):
         link_path = target_dir / item_name
@@ -167,11 +170,21 @@ def _sync_location(project_dir: Path, location: str) -> dict:
                 elif link_path.exists():
                     link_path.rmdir()
         elif link_path.exists():
-            # Real file/directory — skip, don't overwrite local work
-            existing.append(item_name)
-            continue
+            if repair:
+                # Replace stale plain copy with proper link
+                import shutil
+                if link_path.is_dir():
+                    shutil.rmtree(str(link_path))
+                else:
+                    link_path.unlink()
+                repaired.append(item_name)
+            else:
+                # Real file/directory — skip, don't overwrite local work
+                existing.append(item_name)
+                continue
 
-        # Create link: try symlink first, fall back to junction/copy on Windows
+        # Create link: try symlink first, fall back on Windows to
+        # directory junctions (dirs) or hardlinks (files) — both write through
         try:
             os.symlink(str(source_path).replace("\\", "/"), str(link_path),
                         target_is_directory=loc["is_dir"])
@@ -182,8 +195,8 @@ def _sync_location(project_dir: Path, location: str) -> dict:
                     _create_junction(link_path, source_path)
                     created.append(item_name)
                 elif not loc["is_dir"]:
-                    import shutil
-                    shutil.copy2(str(source_path), str(link_path))
+                    # Hardlink: no elevation needed, writes through in both directions
+                    os.link(str(source_path), str(link_path))
                     created.append(item_name)
                 else:
                     raise
@@ -212,15 +225,16 @@ def _sync_location(project_dir: Path, location: str) -> dict:
         "created": created,
         "existing": existing,
         "removed": removed,
+        "repaired": repaired,
         "errors": errors,
     }
 
 
-def _sync_all_locations(project_dir: Path) -> dict:
+def _sync_all_locations(project_dir: Path, repair: bool = False) -> dict:
     """Sync symlinks for all shared content locations."""
     results = {}
     for location in SHARED_LOCATIONS:
-        results[location] = _sync_location(project_dir, location)
+        results[location] = _sync_location(project_dir, location, repair=repair)
     return results
 
 
@@ -269,7 +283,13 @@ def _print_sync_results(results: dict):
     """Print human-readable sync results across all locations."""
     total_created = 0
     total_existing = 0
+    total_repaired = 0
     for location, result in results.items():
+        if result.get("repaired"):
+            total_repaired += len(result["repaired"])
+            print(f"  {location}: repaired {len(result['repaired'])}")
+            for item in result["repaired"]:
+                print(f"    ~ {item}")
         if result["created"]:
             total_created += len(result["created"])
             print(f"  {location}: linked {len(result['created'])}")
@@ -284,7 +304,7 @@ def _print_sync_results(results: dict):
                 print(f"  ! {location}/{e['item']}: {e['error']}")
         total_existing += len(result["existing"])
 
-    if total_created == 0 and not any(r["removed"] for r in results.values()):
+    if total_created == 0 and total_repaired == 0 and not any(r["removed"] for r in results.values()):
         print(f"All shared content already linked ({total_existing} items).")
 
 
@@ -298,6 +318,8 @@ def link():
     parser = argparse.ArgumentParser(description="Symlink shared content into a consumer project")
     parser.add_argument("project_dir", nargs="?", default=".",
                         help="Path to the consumer project root (default: current directory)")
+    parser.add_argument("--repair", action="store_true",
+                        help="Replace plain directory/file copies with proper symlinks/junctions")
     parser.add_argument("--json", action="store_true", help="JSON output")
     args = parser.parse_args()
 
@@ -306,7 +328,7 @@ def link():
         print(f"Error: {project} is not a directory", file=sys.stderr)
         sys.exit(1)
 
-    results = _sync_all_locations(project)
+    results = _sync_all_locations(project, repair=args.repair)
 
     if args.json:
         print(json.dumps({"project": str(project), **results}, indent=2))
