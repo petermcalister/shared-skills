@@ -278,9 +278,27 @@ to check the full implementation against this plan. The reviewer checks:
 
 Critical and Important issues must be fixed before completion.
 
+## Documentation Sweep
+
+After code review passes, check whether these files need updating to
+reflect the new work. Only update what has actually changed — don't
+rewrite sections that are still accurate.
+
+| File | Check for |
+|------|-----------|
+| `CLAUDE.md` | CLI shortcuts table, current actions table, current state, tool structure tree, version number |
+| `README.md` | CLI reference examples, architecture descriptions, feature lists |
+| `pyproject.toml` | Already handled by implementation — verify only |
+| Plugin manifests (`plugin.json`) | Version bump if plugin-packaged features changed |
+| Startup tool description (`__main__.py`) | If startup gained new responsibilities |
+
+**Skip this section** for pure refactoring, test-only changes, or
+internal restructuring that doesn't affect the user-facing surface.
+
 ## Acceptance Criteria
-All features in `{plan-name}-features.json` have `passes: true`
-and the final code review assessment is "Ready to merge".
+All features in `{plan-name}-features.json` have `passes: true`,
+the final code review assessment is "Ready to merge",
+and documentation is up to date.
 ```
 
 ---
@@ -322,6 +340,9 @@ and the final code review assessment is "Ready to merge".
 - [ ] `passes: true` in feature JSON
 - [ ] Changes committed with descriptive message
 - [ ] Progress file updated
+
+### After All Features
+- [ ] Documentation sweep: CLAUDE.md, README.md, plugin manifests updated if needed
 
 ### End of Session
 - [ ] No uncommitted changes
