@@ -4,66 +4,62 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This repo contains **shared reusable Claude Code skills** for a personal assistant system ("pete-pa") hosted in the adjacent `~/RepoBase/cowork` project. Skills are developed here and consumed via git submodule at `cowork/.claude/skills/shared/`.
+This repo contains **shared reusable Claude Code skills, commands, and CLI tools** consumed by multiple projects under `~/RepoBase/`. Consumer projects discover shared skills via symlinks from their `.claude/skills/` into this repo.
 
-Current focus: **diagram generation skills** (Mermaid + Excalidraw) and a **skill-creator** eval framework ported from Anthropic.
+## How Sharing Works
 
-## Architecture
+Consumer projects connect via two mechanisms:
+- **Symlinks** in `.claude/skills/` point to skills here (handles discovery)
+- **`additionalDirectories`** in `.claude/settings.json` grants file access (handles references, scripts)
 
-### Skills
+Both are set up automatically by `library-setup <project-dir>`.
 
-| Skill | Based On | Key Feature |
-|-------|----------|-------------|
-| `skills/mermaid-diagram` | [SpillwaveSolutions/design-doc-mermaid](https://github.com/SpillwaveSolutions/design-doc-mermaid) | Hierarchical routing, Python utilities, resilient validation workflow, 28-error troubleshooting guide |
-| `skills/excalidraw-diagram` | [coleam00/excalidraw-diagram-skill](https://github.com/coleam00/excalidraw-diagram-skill) | "Argue not display" philosophy, Playwright render-view-fix loop, section-by-section large diagram strategy |
-| `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 5-stage skill creation workflow, eval scripts, A/B variant testing |
+Edits to symlinked skills write directly to this repo. Push with `library-push` or `/push-skills`.
 
-### Integration with cowork
+## Skills
 
-```
-shared-skills/skills/  ←── git submodule ──→  cowork/.claude/skills/shared/
-                                                    ↑
-                                          pete-pa/commands/diagram-*.md (launchers)
-```
+All skills live at `.claude/skills/<name>/SKILL.md` with YAML frontmatter (`name`, `description`, `version`).
 
-Skills are built first in `cowork/pete-pa/skills/`, then graduated to `shared-skills/skills/` once proven.
+| Skill | Purpose |
+|-------|---------|
+| `mermaid-diagram` | Validated Mermaid diagrams with mmdc + troubleshooting guide |
+| `excalidraw-diagram` | Excalidraw JSON with Playwright render-view-fix loop |
+| `skill-creator` | Create, test, and optimize skills with eval infrastructure |
+| `systematic-debugging` | Root-cause investigation before proposing fixes |
+| `test-driven-development` | RED-GREEN-REFACTOR cycle for code |
+| `brainstorming` | Collaborative design exploration before implementation |
+| `using-git-worktrees` | Isolated workspaces for parallel branch work |
+| `plugin-builder` | Build Claude Code plugins |
+| `library-management` | Set up and maintain the shared library |
 
-### Mermaid Validation Pipeline
+## CLI Tools
 
-```
-Claude writes .mmd → validate_mermaid.py runs mmdc →
-  IF success: render PNG/SVG → return output path
-  IF error: check troubleshooting.md (28 errors) → fix → retry
-  NEVER add a diagram to markdown until it passes validation
-```
+Registered in `pyproject.toml`. Install with `poetry install`.
 
-Python scripts: `extract_mermaid.py`, `mermaid_to_image.py`, `validate_mermaid.py`
-
-### Excalidraw Render-View-Fix Loop
-
-```
-Agent writes .excalidraw JSON → render_excalidraw.py (Playwright + Chromium) →
-  Captures PNG → Agent views PNG → Audits for defects →
-  Fixes JSON → Re-renders → Repeats (2-4 iterations typical)
-```
-
-Setup: `cd references && uv sync && uv run playwright install chromium`
-
-## Feature Tracking
-
-24 features tracked in `shared-skills-features.json` across 5 phases. Plan details in `shared-skills.md`.
-
-## Tech Stack
-
-- Python 3.12+ with poetry for package management
-- mmdc (mermaid-cli) for Mermaid diagram validation/rendering
-- Playwright + Chromium for Excalidraw visual validation
-- pytest for unit tests
-- Skills follow YAML frontmatter convention: `name`, `description`, `version`
+| Command | Purpose |
+|---------|---------|
+| `library-setup <dir>` | Full setup: settings.json + hook + symlinks |
+| `library-link [dir]` | Create/refresh symlinks (idempotent) |
+| `library-status` | Repo status + skill inventory |
+| `library-list` | List skills with descriptions |
+| `library-push ["msg"]` | Commit + push this repo |
+| `library-sync` | Git pull + refresh symlinks |
+| `library-verify` | Run verification script |
 
 ## Conventions
 
-- Skills use Pete's YAML frontmatter pattern (see `template/SKILL.md`)
-- Commands use `${CLAUDE_PLUGIN_ROOT}` to reference skill paths within pete-pa
-- Diagram skills in shared-skills are referenced via project-level path (not plugin-relative)
-- Python scripts use `#!/usr/bin/env python3` and support `--json` output where applicable
+- Skills use YAML frontmatter: `name`, `description` (trigger-focused), `version`
+- Descriptions start with "Use when..." — no workflow summaries (causes undertriggering)
+- Each skill has `evals/trigger-eval.json` + `evals/implementation-eval.json`
+- Heavy reference material goes in `references/`, not inline in SKILL.md
+- Keep SKILL.md under 500 lines
+- No project-specific references (cowork, pete-pa) — skills must be portable
+- All paths relative to the skill directory or use `~/RepoBase/` convention
+- Poetry for package management
+- Python scripts use `shell=True` on Windows for mmdc subprocess calls
+
+## Consumer Projects
+
+Currently: `cowork`, `EmailEvidenceLocker` (both under `~/RepoBase/`).
+
+To add a new consumer: `library-setup ~/RepoBase/new-project`
