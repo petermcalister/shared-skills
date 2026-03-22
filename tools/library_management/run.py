@@ -2,8 +2,9 @@
 """Library management CLI for shared-skills.
 
 Commands:
-    library-status    Show shared-skills repo status and discovered skills
+    library-status    Show shared-skills repo status and discovered content
     library-setup     Configure a consumer project to use shared skills
+    library-link      Create/refresh symlinks for all shared content
     library-verify    Verify skill discovery in a consumer project
     library-push      Commit and push shared-skills changes
     library-sync      Pull latest shared skills from remote
@@ -19,16 +20,50 @@ from pathlib import Path
 
 # Resolve shared-skills repo root (parent of tools/)
 SHARED_SKILLS_DIR = Path(__file__).resolve().parent.parent.parent
-SKILLS_PATH = SHARED_SKILLS_DIR / ".claude" / "skills"
-COMMANDS_PATH = SHARED_SKILLS_DIR / ".claude" / "commands"
+
+# The four shared content locations
+SHARED_LOCATIONS = {
+    "skills": {
+        "shared": SHARED_SKILLS_DIR / ".claude" / "skills",
+        "local": ".claude/skills",
+        "detect": lambda p: (p / "SKILL.md").is_file(),  # skills are directories with SKILL.md
+        "is_dir": True,
+    },
+    "agents": {
+        "shared": SHARED_SKILLS_DIR / ".claude" / "agents",
+        "local": ".claude/agents",
+        "detect": lambda p: p.suffix == ".md",  # agents are .md files
+        "is_dir": False,
+    },
+    "commands": {
+        "shared": SHARED_SKILLS_DIR / ".claude" / "commands",
+        "local": ".claude/commands",
+        "detect": lambda p: p.suffix == ".md",  # commands are .md files
+        "is_dir": False,
+    },
+}
+
+
+def _find_shared_items(location: str) -> set[str]:
+    """Find all shared items in a location."""
+    loc = SHARED_LOCATIONS[location]
+    shared_path = loc["shared"]
+    if not shared_path.exists():
+        return set()
+
+    if loc["is_dir"]:
+        return {d.name for d in shared_path.iterdir() if d.is_dir() and loc["detect"](d)}
+    else:
+        return {f.name for f in shared_path.iterdir() if loc["detect"](f)}
 
 
 def _find_skills() -> list[dict]:
     """Find all SKILL.md files and extract name + description."""
     skills = []
-    if not SKILLS_PATH.exists():
+    skills_path = SHARED_LOCATIONS["skills"]["shared"]
+    if not skills_path.exists():
         return skills
-    for skill_dir in sorted(SKILLS_PATH.iterdir()):
+    for skill_dir in sorted(skills_path.iterdir()):
         skill_md = skill_dir / "SKILL.md"
         if not skill_md.is_file():
             continue
@@ -54,64 +89,124 @@ def _find_skills() -> list[dict]:
 
 def _find_commands() -> list[str]:
     """Find all slash command .md files."""
-    if not COMMANDS_PATH.exists():
+    commands_path = SHARED_LOCATIONS["commands"]["shared"]
+    if not commands_path.exists():
         return []
-    return sorted(p.stem for p in COMMANDS_PATH.glob("*.md"))
+    return sorted(p.stem for p in commands_path.glob("*.md"))
 
 
-def _sync_symlinks(project_dir: Path) -> dict:
-    """Create/update symlinks from a consumer project's .claude/skills/ to shared skills.
+def _is_junction(path: Path) -> bool:
+    """Check if a path is a Windows directory junction."""
+    if sys.platform != "win32":
+        return False
+    try:
+        import ctypes
+        FILE_ATTRIBUTE_REPARSE_POINT = 0x0400
+        attrs = ctypes.windll.kernel32.GetFileAttributesW(str(path))
+        return attrs != -1 and bool(attrs & FILE_ATTRIBUTE_REPARSE_POINT)
+    except Exception:
+        return False
+
+
+def _junction_target(path: Path) -> Path | None:
+    """Resolve the target of a Windows directory junction."""
+    try:
+        return path.resolve()
+    except OSError:
+        return None
+
+
+def _create_junction(link_path: Path, target_path: Path):
+    """Create a Windows directory junction via PowerShell."""
+    subprocess.run(
+        ["powershell", "-NoProfile", "-c",
+         f"New-Item -ItemType Junction -Path '{link_path}' -Target '{target_path}'"],
+        capture_output=True, check=True,
+    )
+
+
+def _sync_location(project_dir: Path, location: str) -> dict:
+    """Sync symlinks/junctions for a single shared content location.
 
     Returns dict with created, existing, removed, and errors lists.
+    On Windows, uses directory junctions (no elevation required) for
+    directories and file copies for files, falling back from os.symlink().
     """
-    target_skills_dir = project_dir / ".claude" / "skills"
-    target_skills_dir.mkdir(parents=True, exist_ok=True)
+    loc = SHARED_LOCATIONS[location]
+    shared_path = loc["shared"]
+    target_dir = project_dir / loc["local"]
 
-    shared_skills = {d.name for d in SKILLS_PATH.iterdir() if (d / "SKILL.md").is_file()}
+    if not shared_path.exists():
+        return {"created": [], "existing": [], "removed": [], "errors": []}
+
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    shared_items = _find_shared_items(location)
     created, existing, removed, errors = [], [], [], []
 
-    # Create/update symlinks for each shared skill
-    for skill_name in sorted(shared_skills):
-        link_path = target_skills_dir / skill_name
-        source_path = SKILLS_PATH / skill_name
+    for item_name in sorted(shared_items):
+        link_path = target_dir / item_name
+        source_path = shared_path / item_name
 
-        if link_path.is_symlink():
-            # Already a symlink — check if it points to the right place
+        # Check for existing symlink or junction
+        if link_path.is_symlink() or _is_junction(link_path):
             try:
-                current_target = Path(os.readlink(str(link_path)))
-                # Normalise for comparison
-                if current_target.resolve() == source_path.resolve():
-                    existing.append(skill_name)
+                current_target = link_path.resolve()
+                if current_target == source_path.resolve():
+                    existing.append(item_name)
                     continue
-                # Wrong target — remove and recreate
-                link_path.unlink()
+                # Points elsewhere — remove and re-create
+                if link_path.is_symlink():
+                    link_path.unlink()
+                else:
+                    # Junctions must be removed as directories
+                    link_path.rmdir()
             except OSError:
-                link_path.unlink()
+                if link_path.is_symlink():
+                    link_path.unlink()
+                elif link_path.exists():
+                    link_path.rmdir()
         elif link_path.exists():
-            # Real directory (local skill) — skip, don't overwrite local work
-            existing.append(skill_name)
+            # Real file/directory — skip, don't overwrite local work
+            existing.append(item_name)
             continue
 
+        # Create link: try symlink first, fall back to junction/copy on Windows
         try:
-            # Use forward slashes for cross-platform symlink compatibility
-            os.symlink(str(source_path).replace("\\", "/"), str(link_path))
-            created.append(skill_name)
-        except OSError as e:
-            errors.append({"skill": skill_name, "error": str(e)})
-
-    # Remove stale symlinks that point to skills no longer in shared-skills
-    for item in target_skills_dir.iterdir():
-        if item.is_symlink():
+            os.symlink(str(source_path).replace("\\", "/"), str(link_path),
+                        target_is_directory=loc["is_dir"])
+            created.append(item_name)
+        except OSError:
             try:
-                target = Path(os.readlink(str(item))).resolve()
-                if str(SKILLS_PATH.resolve()) in str(target) and item.name not in shared_skills:
-                    item.unlink()
+                if loc["is_dir"] and sys.platform == "win32":
+                    _create_junction(link_path, source_path)
+                    created.append(item_name)
+                elif not loc["is_dir"]:
+                    import shutil
+                    shutil.copy2(str(source_path), str(link_path))
+                    created.append(item_name)
+                else:
+                    raise
+            except Exception as e2:
+                errors.append({"item": item_name, "error": str(e2)})
+
+    # Remove stale symlinks/junctions pointing into shared-skills
+    for item in target_dir.iterdir():
+        is_link = item.is_symlink() or _is_junction(item)
+        if is_link:
+            try:
+                target = item.resolve()
+                if str(shared_path.resolve()) in str(target) and item.name not in shared_items:
+                    if item.is_symlink():
+                        item.unlink()
+                    else:
+                        item.rmdir()
                     removed.append(item.name)
             except OSError:
                 pass
 
-    # Maintain .gitignore so symlinked skills aren't tracked in the consumer repo
-    _update_skills_gitignore(target_skills_dir, shared_skills)
+    # Maintain .gitignore
+    _update_gitignore(target_dir, shared_items, location)
 
     return {
         "created": created,
@@ -121,43 +216,86 @@ def _sync_symlinks(project_dir: Path) -> dict:
     }
 
 
-def _update_skills_gitignore(skills_dir: Path, shared_skill_names: set[str]):
-    """Write a .gitignore in .claude/skills/ that ignores symlinked shared skills."""
-    gitignore_path = skills_dir / ".gitignore"
-    header = "# Symlinked shared skills (managed by library-link, do not edit)\n"
+def _sync_all_locations(project_dir: Path) -> dict:
+    """Sync symlinks for all shared content locations."""
+    results = {}
+    for location in SHARED_LOCATIONS:
+        results[location] = _sync_location(project_dir, location)
+    return results
 
-    # Read existing lines that aren't managed by us
+
+def _update_gitignore(target_dir: Path, shared_names: set[str], location: str):
+    """Write a .gitignore in the target dir that ignores symlinked shared content."""
+    gitignore_path = target_dir / ".gitignore"
+    header = f"# Shared {location} (managed by library-link, do not edit)"
+    footer = f"# End shared {location}"
+
+    # Legacy headers to clean up from earlier versions
+    legacy_headers = [
+        f"# Symlinked shared {location} (managed by library-link, do not edit)",
+    ]
+    legacy_footers = [
+        f"# End shared {location}",
+    ]
+
+    # Read existing lines outside any managed block (current or legacy)
+    all_headers = [header] + legacy_headers
     existing_lines = []
     in_managed_block = False
     if gitignore_path.exists():
         for line in gitignore_path.read_text(encoding="utf-8").splitlines():
-            if line == header.strip():
+            if line in all_headers:
                 in_managed_block = True
                 continue
             if in_managed_block:
-                if line.startswith("# End shared skills"):
+                if line in legacy_footers or line == footer:
                     in_managed_block = False
                 continue
             existing_lines.append(line)
 
     # Build the managed block
-    managed = [header.strip()]
-    for name in sorted(shared_skill_names):
-        managed.append(f"{name}/")
-    managed.append("# End shared skills")
+    loc = SHARED_LOCATIONS[location]
+    suffix = "/" if loc["is_dir"] else ""
+    managed = [header]
+    for name in sorted(shared_names):
+        managed.append(f"{name}{suffix}")
+    managed.append(footer)
 
-    # Combine and write
     all_lines = existing_lines + [""] + managed if existing_lines else managed
     gitignore_path.write_text("\n".join(all_lines) + "\n", encoding="utf-8")
 
 
-def link():
-    """Create symlinks from a consumer project to shared skills.
+def _print_sync_results(results: dict):
+    """Print human-readable sync results across all locations."""
+    total_created = 0
+    total_existing = 0
+    for location, result in results.items():
+        if result["created"]:
+            total_created += len(result["created"])
+            print(f"  {location}: linked {len(result['created'])}")
+            for item in result["created"]:
+                print(f"    + {item}")
+        if result["removed"]:
+            print(f"  {location}: removed {len(result['removed'])} stale")
+            for item in result["removed"]:
+                print(f"    - {item}")
+        if result["errors"]:
+            for e in result["errors"]:
+                print(f"  ! {location}/{e['item']}: {e['error']}")
+        total_existing += len(result["existing"])
 
-    This is the primary mechanism for making shared skills discoverable
-    by Claude Code, working around the additionalDirectories limitation.
+    if total_created == 0 and not any(r["removed"] for r in results.values()):
+        print(f"All shared content already linked ({total_existing} items).")
+
+
+def link():
+    """Create symlinks from a consumer project to all shared content.
+
+    Symlinks .claude/skills/, .claude/agents/, and .claude/commands/ from
+    the shared-skills repo into the consumer project. Manages .gitignore
+    in each directory to prevent symlinked content from being tracked.
     """
-    parser = argparse.ArgumentParser(description="Symlink shared skills into a consumer project")
+    parser = argparse.ArgumentParser(description="Symlink shared content into a consumer project")
     parser.add_argument("project_dir", nargs="?", default=".",
                         help="Path to the consumer project root (default: current directory)")
     parser.add_argument("--json", action="store_true", help="JSON output")
@@ -168,37 +306,23 @@ def link():
         print(f"Error: {project} is not a directory", file=sys.stderr)
         sys.exit(1)
 
-    result = _sync_symlinks(project)
+    results = _sync_all_locations(project)
 
     if args.json:
-        print(json.dumps({"project": str(project), **result}, indent=2))
+        print(json.dumps({"project": str(project), **results}, indent=2))
     else:
-        if result["created"]:
-            print(f"Linked {len(result['created'])} skill(s):")
-            for s in result["created"]:
-                print(f"  + {s}")
-        if result["existing"]:
-            print(f"Already present: {len(result['existing'])} skill(s)")
-        if result["removed"]:
-            print(f"Removed stale: {len(result['removed'])} symlink(s)")
-            for s in result["removed"]:
-                print(f"  - {s}")
-        if result["errors"]:
-            print(f"Errors: {len(result['errors'])}")
-            for e in result["errors"]:
-                print(f"  ! {e['skill']}: {e['error']}")
-        if not result["created"] and not result["removed"]:
-            print("All shared skills already linked.")
+        _print_sync_results(results)
 
 
 def status():
-    """Show shared-skills repo status and discovered skills."""
+    """Show shared-skills repo status and discovered content."""
     parser = argparse.ArgumentParser(description="Shared-skills repo status")
     parser.add_argument("--json", action="store_true", help="JSON output")
     args = parser.parse_args()
 
     skills = _find_skills()
     commands = _find_commands()
+    agents = sorted(_find_shared_items("agents"))
 
     # Git status
     dirty = False
@@ -223,8 +347,10 @@ def status():
         "dirty": dirty,
         "skills": skills,
         "commands": commands,
+        "agents": agents,
         "skill_count": len(skills),
         "command_count": len(commands),
+        "agent_count": len(agents),
     }
 
     if args.json:
@@ -238,6 +364,9 @@ def status():
         print(f"\nCommands ({len(commands)}):")
         for c in commands:
             print(f"  /{c}")
+        print(f"\nAgents ({len(agents)}):")
+        for a in agents:
+            print(f"  {a}")
 
 
 def list_skills():
@@ -258,8 +387,9 @@ def list_skills():
 def setup():
     """Configure a consumer project to use shared skills.
 
-    Creates/updates .claude/settings.json with additionalDirectories
-    and registers the SessionStart verification hook.
+    Creates/updates .claude/settings.json with additionalDirectories,
+    registers the SessionStart verification hook, and creates symlinks
+    for all shared content (skills, agents, commands).
     """
     parser = argparse.ArgumentParser(description="Set up shared skills in a consumer project")
     parser.add_argument("project_dir", help="Path to the consumer project root")
@@ -312,8 +442,8 @@ def setup():
     # Write settings
     settings_path.write_text(json.dumps(settings, indent=2), encoding="utf-8")
 
-    # Create symlinks for skill discovery
-    link_result = _sync_symlinks(project)
+    # Create symlinks for all shared content
+    link_results = _sync_all_locations(project)
 
     result = {
         "project": str(project),
@@ -321,9 +451,7 @@ def setup():
         "shared_skills_dir": shared_path,
         "additionalDirectories_added": shared_path not in add_dirs,
         "hook_added": not already_has,
-        "skills_linked": link_result["created"],
-        "skills_existing": link_result["existing"],
-        "link_errors": link_result["errors"],
+        "links": link_results,
     }
 
     if args.json:
@@ -333,16 +461,8 @@ def setup():
         print(f"  Settings: {settings_path}")
         print(f"  additionalDirectories: {shared_path}")
         print(f"  SessionStart hook: {'added' if not already_has else 'already present'}")
-        if link_result["created"]:
-            print(f"  Skills linked: {len(link_result['created'])}")
-            for s in link_result["created"]:
-                print(f"    + {s}")
-        else:
-            print(f"  Skills: {len(link_result['existing'])} already linked")
-        if link_result["errors"]:
-            for e in link_result["errors"]:
-                print(f"  ! {e['skill']}: {e['error']}")
-        print(f"\nRestart Claude Code in {project} to pick up shared skills.")
+        _print_sync_results(link_results)
+        print(f"\nRestart Claude Code in {project} to pick up shared content.")
 
 
 def verify():
@@ -393,9 +513,9 @@ def sync():
 
     # Refresh symlinks in the consumer project
     project = Path(args.project).resolve()
-    link_result = {}
-    if (project / ".claude" / "skills").exists():
-        link_result = _sync_symlinks(project)
+    link_results = {}
+    if (project / ".claude").exists():
+        link_results = _sync_all_locations(project)
 
     if args.json:
         print(json.dumps({
@@ -403,7 +523,7 @@ def sync():
             "error": result.stderr.strip(),
             "returncode": result.returncode,
             "skills": _find_skills(),
-            "symlinks": link_result,
+            "symlinks": link_results,
         }, indent=2))
     else:
         print(result.stdout)
@@ -413,7 +533,6 @@ def sync():
         print(f"\nAvailable skills ({len(skills)}):")
         for s in skills:
             print(f"  {s['name']}")
-        if link_result.get("created"):
-            print(f"\nNew skills linked: {', '.join(link_result['created'])}")
-        if link_result.get("removed"):
-            print(f"Stale symlinks removed: {', '.join(link_result['removed'])}")
+        if link_results:
+            print()
+            _print_sync_results(link_results)

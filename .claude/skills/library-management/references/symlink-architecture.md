@@ -8,16 +8,30 @@ We discovered this on 2026-03-21 and pivoted to symlinks as the discovery mechan
 
 ## How it works
 
+Three directories are symlinked:
+
 ```
-Consumer project (.claude/skills/)          Shared-skills repo (.claude/skills/)
-├── behave-creator/        (local, real)    ├── brainstorming/SKILL.md
-├── brainstorming/ ──────> symlink ────────>├── excalidraw-diagram/SKILL.md
-├── excalidraw-diagram/ ─> symlink ────────>├── library-management/SKILL.md
-├── library-management/ ─> symlink ────────>├── mermaid-diagram/SKILL.md
-├── mermaid-diagram/ ────> symlink ────────>├── plugin-builder/SKILL.md
+Consumer project                            Shared-skills repo
+.claude/skills/                             .claude/skills/
+├── behave-creator/    (local, real)        ├── brainstorming/SKILL.md
+├── brainstorming/ ──> symlink ────────────>├── excalidraw-diagram/SKILL.md
 ├── ...                                     ├── ...
-└── .gitignore  (ignores all symlinked dirs)
+└── .gitignore                              └── using-git-worktrees/SKILL.md
+
+.claude/agents/                             .claude/agents/
+├── reviewer.md ─────> symlink/copy ───────>├── reviewer.md
+├── run-agent.md ────> symlink/copy ───────>├── run-agent.md
+└── .gitignore
+
+.claude/commands/                           .claude/commands/
+├── deploy.md          (local, real)        ├── checkin.md
+├── checkin.md ──────> symlink/copy ───────>├── plan-n-park.md
+├── ...                                     ├── ...
+└── .gitignore
 ```
+
+On Windows, file symlinks require elevation. `library-link` falls back to
+directory junctions for skill dirs and file copies for agents/commands.
 
 - **Symlinks** make Claude Code discover shared skills as if they were local
 - **`.gitignore`** in `.claude/skills/` prevents symlinked content from being tracked in the consumer repo
