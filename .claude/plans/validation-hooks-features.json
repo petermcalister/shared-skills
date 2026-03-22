@@ -1,0 +1,42 @@
+{
+  "plan_name": "validation-hooks",
+  "created": "2026-03-22",
+  "features": [
+    {
+      "id": "F001",
+      "description": "library-lint CLI: structural validation of SKILL.md files (frontmatter, line count, no project-specific refs, no hardcoded paths, referenced files exist)",
+      "acceptance": "library-lint runs on all skills, reports violations with file:line, exits 0 when clean, exits 1 when violations found. Catches: missing name/description/version, >500 lines, cowork/pete-pa refs, ${CLAUDE_PLUGIN_ROOT}, absolute paths outside ~/RepoBase/, broken relative file references.",
+      "passes": false
+    },
+    {
+      "id": "F002",
+      "description": "library-lint: tool independence check — verify no cross-imports between tool packages under tools/",
+      "acceptance": "library-lint --tools scans all .py files under tools/*/ and reports any imports from sibling tool packages. tools/library_management/ importing from tools/some_other/ is a violation. Importing from stdlib, third-party packages, or within the same package is fine.",
+      "passes": false
+    },
+    {
+      "id": "F003",
+      "description": "library-health CLI: scan ~/RepoBase/ for consumer projects and report ecosystem health",
+      "acceptance": "library-health discovers consumer projects by scanning ~/RepoBase/*/.claude/settings.json for additionalDirectories pointing to shared-skills. For each consumer: checks symlinks are valid, reports broken/missing/stale symlinks, reports if library-link is needed. Also reports uncommitted changes in shared-skills itself.",
+      "passes": false
+    },
+    {
+      "id": "F004",
+      "description": "Git pre-commit hook: runs library-lint on staged SKILL.md and .py files, blocks commit on violations",
+      "acceptance": "scripts/pre-commit exists as a git hook script. Only lints files that are staged (git diff --cached). Exits 0 if clean, exits 1 with violation report if not. install-hooks command or library-setup installs the hook to .git/hooks/pre-commit.",
+      "passes": false
+    },
+    {
+      "id": "F005",
+      "description": "SessionStart hook: runs library-health on session start in shared-skills repo",
+      "acceptance": "shared-skills .claude/settings.json has a SessionStart hook running library-health. Reports consumer project status and any ecosystem issues at session start. Non-blocking (exit 0 always).",
+      "passes": false
+    },
+    {
+      "id": "F006",
+      "description": "Register library-lint and library-health in pyproject.toml, update library-management SKILL.md with new tools",
+      "acceptance": "pyproject.toml has library-lint and library-health entries. library-management SKILL.md documents both tools with usage examples. poetry install makes both available.",
+      "passes": false
+    }
+  ]
+}
