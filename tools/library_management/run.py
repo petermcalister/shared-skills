@@ -21,7 +21,7 @@ from pathlib import Path
 # Resolve shared-skills repo root (parent of tools/)
 SHARED_SKILLS_DIR = Path(__file__).resolve().parent.parent.parent
 
-# The four shared content locations
+# The shared content locations
 SHARED_LOCATIONS = {
     "skills": {
         "shared": SHARED_SKILLS_DIR / ".claude" / "skills",
@@ -40,6 +40,12 @@ SHARED_LOCATIONS = {
         "local": ".claude/commands",
         "detect": lambda p: p.suffix == ".md",  # commands are .md files
         "is_dir": False,
+    },
+    "tools": {
+        "shared": SHARED_SKILLS_DIR / "tools",
+        "local": "tools",
+        "detect": lambda p: (p / "run.py").is_file(),  # tools are directories with run.py
+        "is_dir": True,
     },
 }
 
@@ -275,6 +281,10 @@ def _update_gitignore(target_dir: Path, shared_names: set[str], location: str):
         managed.append(f"{name}{suffix}")
     managed.append(footer)
 
+    # Strip trailing blank lines from existing content
+    while existing_lines and existing_lines[-1].strip() == "":
+        existing_lines.pop()
+
     all_lines = existing_lines + [""] + managed if existing_lines else managed
     gitignore_path.write_text("\n".join(all_lines) + "\n", encoding="utf-8")
 
@@ -345,6 +355,7 @@ def status():
     skills = _find_skills()
     commands = _find_commands()
     agents = sorted(_find_shared_items("agents"))
+    tools = sorted(_find_shared_items("tools"))
 
     # Git status
     dirty = False
@@ -370,9 +381,11 @@ def status():
         "skills": skills,
         "commands": commands,
         "agents": agents,
+        "tools": tools,
         "skill_count": len(skills),
         "command_count": len(commands),
         "agent_count": len(agents),
+        "tool_count": len(tools),
     }
 
     if args.json:
@@ -389,6 +402,9 @@ def status():
         print(f"\nAgents ({len(agents)}):")
         for a in agents:
             print(f"  {a}")
+        print(f"\nTools ({len(tools)}):")
+        for t in tools:
+            print(f"  {t}")
 
 
 def list_skills():

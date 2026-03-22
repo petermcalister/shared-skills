@@ -1,6 +1,6 @@
 # shared-skills
 
-Reusable Claude Code skills, commands, and CLI tools shared across projects via symlinks.
+Shared agentic primitives: skills, agents, commands & CLI tools — reusable across projects via junctions and hardlinks.
 
 ## Skills
 

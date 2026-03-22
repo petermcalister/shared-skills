@@ -14,11 +14,12 @@ version: 0.5.0
 
 Manage the shared skill library. All repos live under `~/RepoBase/`.
 
-The shared-skills repo lives at `~/RepoBase/shared-skills/`. Three types of content
-are shared: **skills** (directories), **agents** (.md files), and **commands** (.md files).
+The shared-skills repo lives at `~/RepoBase/shared-skills/`. Four types of content
+are shared: **skills** (directories), **agents** (.md files), **commands** (.md files),
+and **tools** (directories with `run.py`).
 
-Consumer projects use symlinks/junctions from their `.claude/skills/`, `.claude/agents/`,
-and `.claude/commands/` to the shared repo, making content discoverable by Claude Code.
+Consumer projects use junctions/hardlinks from their `.claude/skills/`, `.claude/agents/`,
+`.claude/commands/`, and `tools/` to the shared repo, making content discoverable.
 
 The `additionalDirectories` setting in `settings.json` grants file access to the
 shared-skills directory. Symlinks/junctions handle discovery. Both are set up
@@ -39,7 +40,7 @@ This makes all `library-*` commands available system-wide. This is required befo
 
 On Windows, `os.symlink()` requires Developer Mode or elevation. The tools
 automatically fall back to:
-- **Directory junctions** for skills — write-through, no elevation needed
+- **Directory junctions** for skills and tools — write-through, no elevation needed
 - **Hardlinks** for agents/commands — write-through, no elevation needed
 
 All shared content writes through to the shared-skills repo from any consumer

@@ -4,20 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This repo contains **shared reusable Claude Code skills, commands, and CLI tools** consumed by multiple projects under `~/RepoBase/`. Consumer projects discover shared skills via symlinks from their `.claude/skills/` into this repo.
+This repo contains **shared agentic primitives — skills, agents, commands, and tools** consumed by multiple projects under `~/RepoBase/`. Consumer projects discover shared content via junctions and hardlinks.
 
 ## How Sharing Works
 
-Three types of content are shared: **skills**, **agents**, and **commands**.
+Four types of content are shared: **skills**, **agents**, **commands**, and **tools**.
 
 Consumer projects connect via two mechanisms:
-- **Symlinks/junctions** in `.claude/skills/`, `.claude/agents/`, `.claude/commands/` point here (handles discovery)
+- **Junctions/hardlinks** in `.claude/skills/`, `.claude/agents/`, `.claude/commands/`, `tools/` point here (handles discovery)
 - **`additionalDirectories`** in `.claude/settings.json` grants file access (handles references, scripts)
 
 Both are set up automatically by `library-setup <project-dir>`.
 
 On Windows, `os.symlink()` requires elevation. The tools automatically fall back to:
-- **Directory junctions** for skills (write-through, no elevation needed)
+- **Directory junctions** for skills and tools (write-through, no elevation needed)
 - **Hardlinks** for agents/commands (write-through, no elevation needed)
 
 All shared content writes through to this repo from any consumer project. Push with `library-push` or `/push-skills`.
@@ -59,6 +59,15 @@ Commands live at `.claude/commands/<name>.md`.
 | `/reflect` | Distill and preserve learnings from session |
 | `/run-agent` | Execute a plan-n-park |
 | `/sync-skills` | Pull latest shared skills + list available |
+
+## Shared Tools
+
+Tools live at `tools/<name>/` with a `run.py` entry point. Shared to consumer projects via directory junctions.
+
+| Tool | Purpose |
+|------|---------|
+| `library_management` | CLI commands for managing the shared library |
+| `outlook` | Outlook email integration |
 
 ## CLI Tools
 
