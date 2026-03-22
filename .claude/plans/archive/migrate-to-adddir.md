@@ -10,7 +10,7 @@ Replace the git submodule approach for sharing skills with the `additionalDirect
 - `cowork/.claude/skills/` has **duplicate** copies of mermaid-diagram and excalidraw-diagram (both as local skills AND inside the submodule)
 - `shared-skills/` has skills at `.claude/skills/*` (correct for discovery when used as `additionalDirectories`)
 - No `additionalDirectories` configured in cowork yet
-- No shared commands (`/push-skills`, `/sync-all`) exist yet
+- No shared commands (`/push-skills`, `/sync-skills`) exist yet
 - No verification hook exists in cowork
 
 ## Target State
@@ -18,7 +18,7 @@ Replace the git submodule approach for sharing skills with the `additionalDirect
 - Submodule **removed** from cowork
 - `cowork/.claude/settings.json` has `additionalDirectories: ["C:/Users/peter/RepoBase/shared-skills"]`
 - Duplicate skills removed from `cowork/.claude/skills/` (mermaid-diagram, excalidraw-diagram, skill-creator — now discovered via additionalDirectories)
-- Shared commands `/push-skills` and `/sync-all` available in all sessions
+- Shared commands `/push-skills` and `/sync-skills` available in all sessions
 - PostStart hook verifies shared skills on every session start
 - `library-management` skill teaches agents in any repo how to set up this pattern
 
@@ -26,7 +26,7 @@ Replace the git submodule approach for sharing skills with the `additionalDirect
 
 ### F001: Create shared commands and scripts
 - `.claude/commands/push-skills.md` — commit + push shared-skills without leaving consumer repo
-- `.claude/commands/sync-all.md` — pull latest shared skills
+- `.claude/commands/sync-skills.md` — pull latest shared skills
 - `scripts/verify-shared-skills.sh` — PostStart hook script
 - `scripts/push-shared-skills.sh` — standalone push helper
 

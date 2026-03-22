@@ -204,7 +204,7 @@ Then run `library-link` to create symlinks for all shared skills.
 | Command | Purpose |
 |---------|---------|
 | `/push-skills` | Commit + push shared-skills without leaving your project |
-| `/sync-all` | Pull latest + list skills |
+| `/sync-skills` | Pull latest + list skills |
 
 ---
 

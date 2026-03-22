@@ -58,7 +58,7 @@ Commands live at `.claude/commands/<name>.md`.
 | `/push-skills` | Commit + push shared-skills from consumer project |
 | `/reflect` | Distill and preserve learnings from session |
 | `/run-agent` | Execute a plan-n-park |
-| `/sync-all` | Pull latest shared skills + list available |
+| `/sync-skills` | Pull latest shared skills + list available |
 
 ## CLI Tools
 

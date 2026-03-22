@@ -32,7 +32,7 @@ This gives you:
 │   │   │       └── SKILL.md
 │   │   └── commands/                     ← shared slash commands
 │   │       ├── push-skills.md            ← commit & push without leaving cowork
-│   │       └── sync-all.md              ← pull latest shared skills
+│   │       └── sync-skills.md              ← pull latest shared skills
 │   ├── scripts/                          ← shared utility scripts
 │   │   ├── verify-shared-skills.sh       ← PostStart hook verification
 │   │   └── push-shared-skills.sh         ← git add/commit/push helper
@@ -106,7 +106,7 @@ Commit and push any changes in the shared-skills repo.
 5. Report what was committed and pushed
 ```
 
-Create `.claude/commands/sync-all.md`:
+Create `.claude/commands/sync-skills.md`:
 
 ```markdown
 Pull the latest shared skills from the remote.
@@ -339,7 +339,7 @@ Any Claude Code session with `additionalDirectories` pointing here picks up the 
 |------|----------|---------|
 | `.claude/skills/*/SKILL.md` | shared-skills | The actual skill definitions |
 | `.claude/commands/push-skills.md` | shared-skills | Slash command to push without leaving cowork |
-| `.claude/commands/sync-all.md` | shared-skills | Slash command to pull latest |
+| `.claude/commands/sync-skills.md` | shared-skills | Slash command to pull latest |
 | `scripts/verify-shared-skills.sh` | shared-skills | PostStart hook verification |
 | `scripts/push-shared-skills.sh` | shared-skills | Standalone push helper |
 | `.claude/settings.json` | cowork repo | Persists `additionalDirectories` |

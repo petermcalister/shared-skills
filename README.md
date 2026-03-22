@@ -76,7 +76,7 @@ Available in any consumer project via symlinks:
 | Command | Purpose |
 |---------|---------|
 | `/push-skills` | Commit + push shared-skills without leaving your project |
-| `/sync-all` | Pull latest + list skills |
+| `/sync-skills` | Pull latest + list skills |
 | `/checkin` | Git add, commit, push with concise summary |
 | `/plan-n-park` | Create structured implementation plan for multi-session work |
 | `/run-agent` | Execute plan batches via subagents |
