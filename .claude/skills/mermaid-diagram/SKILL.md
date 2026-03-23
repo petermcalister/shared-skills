@@ -51,13 +51,23 @@ mmdc -i diagram.mmd -o diagram.png -b transparent
 
 If validation fails, read `references/guides/troubleshooting.md` — it catalogs 28 common errors with fixes. Apply the fix and retry (up to 3 attempts).
 
+## Workspace
+
+Save all intermediate and output artifacts to the skill's workspace directory:
+
+```
+.claude/skills/mermaid-diagram/workspace/
+```
+
+Use this for `.mmd` source files, rendered `.png`/`.svg` outputs, and validation results. Copy final deliverables to the user's requested location.
+
 ## File Naming
 
 ```
-./diagrams/<context>_<num>_<type>_<title>.mmd
+workspace/<context>_<num>_<type>_<title>.mmd
 ```
 
-Example: `./diagrams/api_design_01_sequence_auth_flow.mmd`
+Example: `workspace/api_design_01_sequence_auth_flow.mmd`
 
 ## Styling
 

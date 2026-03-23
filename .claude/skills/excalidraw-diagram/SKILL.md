@@ -107,12 +107,22 @@ Defaults: `roughness: 0`, `opacity: 100`, `fontFamily: 3`, `fontSize: 16`. The `
 
 ---
 
+## Workspace
+
+Save all intermediate and output artifacts to the skill's workspace directory:
+
+```
+.claude/skills/excalidraw-diagram/workspace/
+```
+
+Use this for `.excalidraw` JSON files and rendered `.png` outputs. Copy final deliverables to the user's requested location.
+
 ## Render & Validate
 
 You can't judge a diagram from JSON. After generating, render to PNG and visually check.
 
 ```bash
-cd references && uv run python render_excalidraw.py <path-to-file.excalidraw>
+cd references && uv run python render_excalidraw.py ../workspace/<file>.excalidraw
 ```
 
 Then Read the PNG and check for:
