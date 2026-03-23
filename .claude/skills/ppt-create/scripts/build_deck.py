@@ -16,6 +16,7 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
 from pptx.dml.color import RGBColor
+from pptx.shapes.autoshape import Shape
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -44,7 +45,7 @@ PALETTES = {
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _rgb(hex_str):
+def _rgb(hex_str: str) -> RGBColor:
     """Convert a 6-char hex string to RGBColor."""
     try:
         return RGBColor.from_string(hex_str)
@@ -55,7 +56,7 @@ def _rgb(hex_str):
         raise e
 
 
-def _set_bg(slide, palette):
+def _set_bg(slide, palette) -> None:
     """Set slide background to palette bg colour."""
     try:
         background = slide.background
@@ -70,7 +71,7 @@ def _set_bg(slide, palette):
 
 
 def _add_textbox(slide, left, top, width, height, text, font_name, font_size,
-                 bold=False, italic=False, color_hex=None, alignment=None, word_wrap=True):
+                 bold=False, italic=False, color_hex=None, alignment=None, word_wrap=True) -> Shape:
     """Add a styled text box to a slide."""
     try:
         txBox = slide.shapes.add_textbox(Inches(left), Inches(top), Inches(width), Inches(height))
@@ -95,7 +96,7 @@ def _add_textbox(slide, left, top, width, height, text, font_name, font_size,
 
 
 def _add_bullets(slide, left, top, width, height, items, font_name, font_size,
-                 color_hex=None, alignment=None):
+                 color_hex=None, alignment=None) -> Shape:
     """Add a bulleted list text box."""
     try:
         txBox = slide.shapes.add_textbox(Inches(left), Inches(top), Inches(width), Inches(height))
@@ -123,7 +124,7 @@ def _add_bullets(slide, left, top, width, height, items, font_name, font_size,
         raise e
 
 
-def _resolve_image(image_path, manifest_dir):
+def _resolve_image(image_path: str, manifest_dir: str) -> str:
     """Resolve image path relative to manifest directory if not absolute."""
     try:
         if os.path.isabs(image_path):
@@ -140,7 +141,7 @@ def _resolve_image(image_path, manifest_dir):
 # Slide renderers
 # ---------------------------------------------------------------------------
 
-def render_title(prs, slide_data, palette, manifest_dir):
+def render_title(prs, slide_data, palette, manifest_dir) -> None:
     """Render a title slide."""
     try:
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -171,7 +172,7 @@ def render_title(prs, slide_data, palette, manifest_dir):
         raise e
 
 
-def render_section_header(prs, slide_data, palette, manifest_dir):
+def render_section_header(prs, slide_data, palette, manifest_dir) -> None:
     """Render a section header slide."""
     try:
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -194,7 +195,7 @@ def render_section_header(prs, slide_data, palette, manifest_dir):
         raise e
 
 
-def render_content(prs, slide_data, palette, manifest_dir):
+def render_content(prs, slide_data, palette, manifest_dir) -> None:
     """Render a content slide with body text and optional bullets."""
     try:
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -218,7 +219,7 @@ def render_content(prs, slide_data, palette, manifest_dir):
         raise e
 
 
-def render_diagram(prs, slide_data, palette, manifest_dir):
+def render_diagram(prs, slide_data, palette, manifest_dir) -> None:
     """Render a diagram slide with image and optional caption."""
     try:
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -243,7 +244,7 @@ def render_diagram(prs, slide_data, palette, manifest_dir):
         raise e
 
 
-def render_diagram_full(prs, slide_data, palette, manifest_dir):
+def render_diagram_full(prs, slide_data, palette, manifest_dir) -> None:
     """Render a full-bleed diagram slide."""
     try:
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -264,7 +265,7 @@ def render_diagram_full(prs, slide_data, palette, manifest_dir):
         raise e
 
 
-def render_metrics(prs, slide_data, palette, manifest_dir):
+def render_metrics(prs, slide_data, palette, manifest_dir) -> None:
     """Render a metrics slide with large stat callouts."""
     try:
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -296,7 +297,7 @@ def render_metrics(prs, slide_data, palette, manifest_dir):
         raise e
 
 
-def render_two_column(prs, slide_data, palette, manifest_dir):
+def render_two_column(prs, slide_data, palette, manifest_dir) -> None:
     """Render a two-column slide."""
     try:
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -336,7 +337,7 @@ def render_two_column(prs, slide_data, palette, manifest_dir):
         raise e
 
 
-def render_comparison(prs, slide_data, palette, manifest_dir):
+def render_comparison(prs, slide_data, palette, manifest_dir) -> None:
     """Render a comparison (before/after, pros/cons) slide."""
     try:
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -375,7 +376,7 @@ def render_comparison(prs, slide_data, palette, manifest_dir):
         raise e
 
 
-def render_closing(prs, slide_data, palette, manifest_dir):
+def render_closing(prs, slide_data, palette, manifest_dir) -> None:
     """Render a closing slide."""
     try:
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -420,7 +421,7 @@ RENDERERS = {
 }
 
 
-def build_deck(manifest_path, output_path):
+def build_deck(manifest_path: str, output_path: str) -> str:
     """Build a PowerPoint deck from a JSON manifest file."""
     try:
         manifest_path = os.path.abspath(manifest_path)
@@ -462,7 +463,7 @@ def build_deck(manifest_path, output_path):
 # CLI
 # ---------------------------------------------------------------------------
 
-def main():
+def main() -> None:
     """CLI entry point."""
     try:
         parser = argparse.ArgumentParser(description="Build a PowerPoint deck from a JSON manifest.")

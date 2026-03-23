@@ -427,6 +427,7 @@ def main() -> None:
         parser.add_argument("--input", required=True, help="Path to input Markdown file")
         parser.add_argument("--images", default=None, help="Directory containing images")
         parser.add_argument("--archetype", default="general", help="Presentation archetype")
+        parser.add_argument("--palette", default="midnight", help="Colour palette key")
         parser.add_argument("--output", required=True, help="Output JSON manifest path")
         args = parser.parse_args()
 
@@ -445,7 +446,7 @@ def main() -> None:
         with open(input_path, "r", encoding="utf-8") as f:
             markdown_text = f.read()
 
-        manifest = parse_markdown(markdown_text, images_dir, args.archetype)
+        manifest = parse_markdown(markdown_text, images_dir, args.archetype, args.palette)
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2, ensure_ascii=False)

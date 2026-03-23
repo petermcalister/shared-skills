@@ -46,7 +46,7 @@ White space is not wasted space. Maintain minimum margins and spacing to prevent
 | Section header | Georgia | 20-24pt | Bold | Palette fg colour, centre-aligned |
 | Body text | Calibri | 14-16pt | Regular | Palette fg colour, left-aligned |
 | Captions | Calibri | 10-12pt | Italic | Palette muted colour |
-| Metric values | Calibri | 60-72pt | Bold | Palette accent colour, centre-aligned |
+| Metric values | Georgia | 60-72pt | Bold | Palette accent colour, centre-aligned |
 | Metric labels | Calibri | 14pt | Regular | Palette muted colour, centre-aligned |
 
 ---
