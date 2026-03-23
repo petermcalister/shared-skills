@@ -1,4 +1,27 @@
+=== Session: 2026-03-23 ===
+Plan: ppt-creator
+Worked on: All 5 batches + code review + fixes
+Completed: All 13 features (F001-F013) implemented and passing
+  - Batch 1 (F001-F004): pyproject.toml, palettes, slide-types, build_deck.py
+  - Batch 2 (F005-F006): manifest-schema.md, parse_report.py
+  - Batch 3 (F007-F010): SKILL.md, archetypes, writing-style, design-principles
+  - Batch 4 (F011-F012): validate_deck.py, test_e2e.py
+  - Batch 5 (F013): trigger + implementation evals
+  - Code review: 3 important issues found and fixed (return type hints, metric font docs, --palette flag)
+  - Documentation sweep: CLAUDE.md updated with ppt-create in skills table
+Blocked: None
+Next session should: Research addendum repos (GongRzhe, anthropics/skills PPTX, etc.) to cross-check implementation; then push/PR
+Environment state: All features passing, e2e test green, not pushed
+
 === Session: 2026-03-22 ===
+Plan: ppt-creator
+Worked on: Planning phase
+Completed: Plan created with 13 features, features JSON created
+Blocked: None
+Next session should: Start with Batch 1 (F001-F004) — create pyproject.toml, palettes.md, slide-types.md, build_deck.py
+Environment state: Clean, poetry installed, all skills have evals
+
+=== Session: 2026-03-22 (earlier) ===
 Plan: validation-hooks
 Worked on: Planning phase
 Completed: Plan created with 6 features

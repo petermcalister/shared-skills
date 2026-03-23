@@ -37,6 +37,7 @@ All skills live at `.claude/skills/<name>/SKILL.md` with YAML frontmatter (`name
 | `using-git-worktrees` | Isolated workspaces for parallel branch work |
 | `plugin-builder` | Build Claude Code plugins |
 | `library-management` | Set up and maintain the shared library |
+| `ppt-create` | PowerPoint presentations from markdown + diagrams via python-pptx |
 
 ## Shared Agents
 

@@ -1,0 +1,84 @@
+{
+  "plan_name": "ppt-creator",
+  "created": "2026-03-22",
+  "features": [
+    {
+      "id": "F001",
+      "description": "Create references/pyproject.toml with python-pptx, Pillow, mistune deps and run uv sync",
+      "acceptance": "uv sync succeeds in references/ directory and uv.lock is generated",
+      "passes": true
+    },
+    {
+      "id": "F002",
+      "description": "Create references/palettes.md with 12 palette definitions (hex values for bg, fg, accent, accent2, muted, highlight, error)",
+      "acceptance": "File contains all 12 palettes with complete hex values and archetype mappings",
+      "passes": true
+    },
+    {
+      "id": "F003",
+      "description": "Create references/slide-types.md with 9 slide type specs (title, section_header, content, diagram, diagram_full, metrics, two_column, comparison, closing)",
+      "acceptance": "Each slide type has description, required/optional fields, layout positions in Inches, and typography specs",
+      "passes": true
+    },
+    {
+      "id": "F004",
+      "description": "Create scripts/build_deck.py — JSON manifest to .pptx builder with 9 slide type renderers",
+      "acceptance": "Run with a 3-slide test manifest (title + diagram + closing) and a test PNG; output .pptx opens with correct slides, dark palette, and embedded image",
+      "passes": true
+    },
+    {
+      "id": "F005",
+      "description": "Create references/manifest-schema.md documenting the JSON manifest format with examples for each slide type",
+      "acceptance": "Schema covers metadata block and all 9 slide type field definitions with examples",
+      "passes": true
+    },
+    {
+      "id": "F006",
+      "description": "Create scripts/parse_report.py — markdown + images directory to JSON manifest using mistune 3.x",
+      "acceptance": "Parse test markdown with 3 sections and 1 image ref; output JSON has correct slide types matching mapping rules",
+      "passes": true
+    },
+    {
+      "id": "F007",
+      "description": "Create SKILL.md with YAML frontmatter, interview workflow, archetype selection, intent routing table, and scripts table",
+      "acceptance": "SKILL.md has frontmatter (name, description, version), 7-step workflow, intent routing table, scripts table; follows mermaid-diagram pattern",
+      "passes": true
+    },
+    {
+      "id": "F008",
+      "description": "Create references/archetypes.md with 12 archetype definitions and decision matrix",
+      "acceptance": "Each archetype has: when to use, default slide sequence, recommended palette, layout style, slide count range; decision matrix maps goal x audience to archetypes",
+      "passes": true
+    },
+    {
+      "id": "F009",
+      "description": "Create references/writing-style.md with technical writing guide for slide content",
+      "acceptance": "Covers title rules, bullet rules, prose rules, caption rules, and anti-patterns list",
+      "passes": true
+    },
+    {
+      "id": "F010",
+      "description": "Create references/design-principles.md with Anthropic's 10 design rules, typography table, and layout constraints",
+      "acceptance": "All 10 rules documented, typography table has sizes/weights, layout constraints include margins and spacing",
+      "passes": true
+    },
+    {
+      "id": "F011",
+      "description": "Create scripts/validate_deck.py — structural validation with optional LibreOffice visual validation",
+      "acceptance": "Structural checks pass on test .pptx; graceful degradation when soffice absent; --json flag outputs structured report",
+      "passes": true
+    },
+    {
+      "id": "F012",
+      "description": "End-to-end integration test: markdown → parse_report.py → build_deck.py → validate_deck.py",
+      "acceptance": "Full pipeline runs without errors; output .pptx has correct slide count, palette colors, and embedded images",
+      "passes": true
+    },
+    {
+      "id": "F013",
+      "description": "Create evals/trigger-eval.json (20 queries) and evals/implementation-eval.json (5 scenarios)",
+      "acceptance": "Trigger eval has 10 should-trigger + 10 should-not; implementation eval has 5 scenarios with assertions",
+      "passes": true
+    }
+  ]
+}
