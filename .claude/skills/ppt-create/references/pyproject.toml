@@ -1,5 +1,0 @@
-[project]
-name = "ppt-creator"
-version = "0.1.0"
-requires-python = ">=3.11"
-dependencies = ["python-pptx>=1.0.0", "Pillow>=10.0.0", "mistune>=3.0.0"]
