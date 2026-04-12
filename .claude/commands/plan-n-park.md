@@ -160,12 +160,11 @@ Document what context/state each test step requires:
 
 ## Phase 5: Work Incrementally
 
-Pick the highest-priority feature with `passes: false`, implement it completely, test it, mark `passes: true`, commit. If time remains, pick next feature.
+Pick the highest-priority feature with `passes: false`, implement it completely, test it, mark `passes: true`. If time remains, pick next feature.
 
 ### Clean State Rule
 
 End every session with:
-- [ ] All changes committed to git (commit only — never push)
 - [ ] Tests passing (or documented why not)
 - [ ] Progress file updated
 - [ ] No half-implemented features
@@ -177,10 +176,10 @@ End every session with:
 Before ending work:
 
 1. Run relevant tests
-2. Check `git status`
-3. Commit with descriptive message referencing the feature ID (never push)
-4. Update progress file with session summary
-5. Update feature list — change `passes: false` to `passes: true` for completed features
+2. Update progress file with session summary
+3. Update feature list — change `passes: false` to `passes: true` for completed features
+
+**Note:** Do not run git commit or push. Version control is handled separately via `/checkin`.
 
 ---
 
@@ -310,9 +309,8 @@ and documentation is up to date.
 | Implement entire plan in one session | Runs out of context mid-feature | One feature at a time |
 | Skip testing before marking done | Bugs accumulate | Always verify with tests |
 | Edit feature descriptions in JSON | Loses requirements | Only change `passes` field |
-| Leave uncommitted changes | Next session starts broken | Commit before ending |
 | Skip progress file | Next session has no context | Always update progress |
-| `git push` during planning/execution | Only the human decides when to push | Commit only |
+| Running git commit/push | Agents should not manage version control | Use `/checkin` instead |
 | Vague acceptance criteria | Untestable outcomes | Name specific scenarios and expected results |
 | Ignoring existing data state | NULL handling surprises | Plan for migrations and backfill |
 
@@ -338,13 +336,11 @@ and documentation is up to date.
 ### After Each Feature
 - [ ] Feature tested and verified
 - [ ] `passes: true` in feature JSON
-- [ ] Changes committed with descriptive message
 - [ ] Progress file updated
 
 ### After All Features
 - [ ] Documentation sweep: CLAUDE.md, README.md, plugin manifests updated if needed
 
 ### End of Session
-- [ ] No uncommitted changes
 - [ ] Tests passing
 - [ ] Progress file has "Next session should:" guidance

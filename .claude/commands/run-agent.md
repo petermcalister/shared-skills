@@ -9,7 +9,7 @@ Execute a plan created by `/plan-n-park` by dispatching `run-agent` subagents fo
 **Core principles:**
 - Subagents protect the main context window — all implementation happens there
 - Each subagent gets 3-4 logically related tasks, not one at a time
-- Standing rules (bug discipline, git discipline, verification) live in the agent definition
+- Standing rules (bug discipline, verification) live in the agent definition
 - The command injects operational context from the plan
 
 ---
@@ -48,7 +48,7 @@ Agent tool:
     [Paste any test isolation patterns]
 ```
 
-The agent definition handles skills (TDD, debugging, behave), standing rules (bug-fixing, git discipline, verification), and report format. The command only injects what's unique to this batch.
+The agent definition handles skills (TDD, debugging, behave), standing rules (bug-fixing, verification), and report format. The command only injects what's unique to this batch.
 
 ## Step 4: Review Subagent Output
 
@@ -57,8 +57,8 @@ When the subagent returns, review its report:
 **Check:**
 - Did it complete all tasks in the batch?
 - Did it run tests and show actual output (not just claims)?
-- Did it commit (not push)?
 - Did it mention any bugs found and fixed?
+- Did it avoid running any git commands?
 
 **If issues found:** Dispatch a fix subagent (same `run-agent` type) with specific instructions. Don't fix manually (protects main context).
 
@@ -75,7 +75,6 @@ Batch N complete: [theme]
 - Features completed: F001, F002, F003
 - Tests: all passing
 - Bugs fixed: [any found along the way]
-- Commits: [list SHAs]
 
 Next batch: [theme] (F004-F006)
 Ready to continue?
@@ -120,12 +119,12 @@ Agent tool:
 - **Important issues:** Dispatch `run-agent` to fix before completion
 - **Minor issues:** Note for user, don't block completion
 
-After fixes, re-run the reviewer to confirm. Final commit (not push). Update progress file and feature JSON.
+After fixes, re-run the reviewer to confirm. Update progress file and feature JSON.
 
 ## Step 7: Finish
 
-- Present summary to user with all commits, features completed, and any remaining work
-- User decides next steps (push, PR, further work)
+- Present summary to user with features completed and any remaining work
+- User decides next steps (`/checkin` to commit, push, PR, further work)
 
 ---
 
@@ -162,5 +161,5 @@ If something needs fixing, dispatch a subagent. Keep the main context clean.
 - Subagent skips tests — reject the report, redispatch with explicit test instructions
 - Subagent claims success without showing output — reject, redispatch
 - Subagent says "found a bug but didn't fix it" — reject, redispatch
-- Subagent ran `git push` — flag to user immediately
+- Subagent ran any git command — flag to user immediately
 - Subagent asks questions — answer them clearly before letting it proceed

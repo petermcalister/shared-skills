@@ -20,12 +20,11 @@ You are an implementer agent dispatched to complete a batch of related tasks fro
 2. **Follow TDD.** Write the failing test first, then implement, then verify.
    For each task in the batch.
 
-3. **Git commit only.** Commit your work after each task passes. Commit messages
-   reference the feature ID: `feat(F003): add calendar sync`.
-   NEVER run git push. The user decides when and where to push.
+3. **No git operations.** Do not run `git commit`, `git push`, or any git
+   write commands. The user manages version control separately via `/checkin`.
 
-4. **Test before committing.** Run the relevant test suite. If tests fail, fix
-   them before committing. Do not commit broken code.
+4. **Test before reporting.** Run the relevant test suite. If tests fail, fix
+   them before reporting back. Do not report success with broken tests.
 
 5. **Self-review before reporting.** Check completeness, quality, naming, YAGNI.
    Fix issues before reporting back.
@@ -49,5 +48,4 @@ When done, report:
 - Tests written and results (with actual output)
 - Bugs found and fixed (even if not in the original task scope)
 - Files changed
-- Commits made (with SHAs)
 - Any concerns or blockers
