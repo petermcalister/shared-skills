@@ -1,0 +1,17 @@
+{
+  "name": "petermcalister-shared-skills",
+  "owner": {
+    "name": "Peter McAlister",
+    "email": "petermcalister@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "story-present",
+      "source": "./.claude/skills/story-present"
+    },
+    {
+      "name": "library-management",
+      "source": "./.claude/skills/library-management"
+    }
+  ]
+}
