@@ -124,6 +124,13 @@ as part of the marketplace restructure. They were replaced by Claude Code's buil
 `/plugin marketplace` and `/plugin install` slash commands plus the new `library-promote`
 tool. See `.claude/plans/skill-marketplace-restructure.md` for the migration rationale.
 
+2026-05-02: removed `references/symlink-architecture.md` (described the pre-v0.6.0
+symlink-based architecture, now dead). The `evals/` directory and its
+`implementation-eval.json` / `trigger-eval.json` were also removed in the same pass —
+they targeted the old triggers (`library-verify`, `additionalDirectories`,
+`set up shared skills`) and need to be rewritten against the new model before being
+restored. Better no evals than wrong evals.
+
 ---
 
 ## Install commands for consumers
