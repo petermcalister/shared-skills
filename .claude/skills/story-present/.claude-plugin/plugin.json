@@ -1,0 +1,9 @@
+{
+  "name": "story-present",
+  "version": "0.1.0",
+  "description": "Generates structurally sound presentations for high-stakes moments — board meetings, steering committees, investor pitches, conference talks, weekly status updates",
+  "author": {
+    "name": "Peter McAlister",
+    "email": "petermcalister@gmail.com"
+  }
+}
