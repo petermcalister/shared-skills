@@ -162,7 +162,7 @@ These were discovered during the first end-to-end install in a clean scratch pro
 
 1. **Slash-command namespacing.** Marketplace-installed plugin commands surface as `<plugin-name>:<command>` — e.g. `/pete-pa:peter-morning-brief-cmd`, NOT `/peter-morning-brief-cmd`. The bare form only works inside the project that owns the commands (i.e. cowork itself, where pete-pa lives in the working tree). Outside cowork, after `/plugin install pete-pa@cowork-private`, every command needs the `pete-pa:` prefix.
 
-2. **Branch pinning.** When a marketplace's `marketplace.json` lives on a non-default branch, use `owner/repo@branch` syntax for `/plugin marketplace add`. Example: `/plugin marketplace add petermcalister/cowork-pa@cowork-dev`. Without the pin, Claude Code clones the default branch (`main`) and fails to find the manifest.
+2. **Branch pinning.** When a marketplace's `marketplace.json` lives on a non-default branch, use `owner/repo@branch` syntax for `/plugin marketplace add`. Example: `/plugin marketplace add petermcalister/cowork-pa@cowork-dev`. Without the pin, Claude Code clones the default branch (`main`) and fails to find the manifest. (For `petermcalister/cowork-pa` specifically, this pin was required until 2026-05-02 when `cowork-dev` was fast-forwarded to `main`. The pattern still matters for any marketplace whose manifest first appears on a feature branch.)
 
 3. **Leading whitespace disables slash-command interception.** A `/plugin install ...` command typed with even a single leading space gets *narrated* by the assistant ("Acknowledged — local plugin commands ran without needing my input") instead of *executed* by Claude Code. The slash must be the very first character of input.
 
