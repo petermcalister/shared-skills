@@ -122,7 +122,7 @@ These were all valid in v0.5.0 and earlier. They are dead in v0.6.0:
 `library-verify`, `library-list`, and `library-status` were removed in v0.6.0 (2026-05-02)
 as part of the marketplace restructure. They were replaced by Claude Code's built-in
 `/plugin marketplace` and `/plugin install` slash commands plus the new `library-promote`
-tool. See `.claude/plans/skill-marketplace-restructure.md` for the migration rationale.
+tool. See `.claude/plans/archive/skill-marketplace-restructure.md` for the migration rationale.
 
 2026-05-02: removed `references/symlink-architecture.md` (described the pre-v0.6.0
 symlink-based architecture, now dead). The `evals/` directory and its
