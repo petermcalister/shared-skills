@@ -153,3 +153,21 @@ For the cowork repo the GitHub name is `cowork-pa` but the marketplace handle is
 `cowork-private`.
 
 Currently promoted public skills (as of 2026-05-02): `story-present`, `library-management`.
+
+---
+
+## Install gotchas (lessons from F013 smoke test, 2026-05-02)
+
+These were discovered during the first end-to-end install in a clean scratch project. Document them in user-facing material so the next person doesn't lose 20 minutes to each:
+
+1. **Slash-command namespacing.** Marketplace-installed plugin commands surface as `<plugin-name>:<command>` — e.g. `/pete-pa:peter-morning-brief-cmd`, NOT `/peter-morning-brief-cmd`. The bare form only works inside the project that owns the commands (i.e. cowork itself, where pete-pa lives in the working tree). Outside cowork, after `/plugin install pete-pa@cowork-private`, every command needs the `pete-pa:` prefix.
+
+2. **Branch pinning.** When a marketplace's `marketplace.json` lives on a non-default branch, use `owner/repo@branch` syntax for `/plugin marketplace add`. Example: `/plugin marketplace add petermcalister/cowork-pa@cowork-dev`. Without the pin, Claude Code clones the default branch (`main`) and fails to find the manifest.
+
+3. **Leading whitespace disables slash-command interception.** A `/plugin install ...` command typed with even a single leading space gets *narrated* by the assistant ("Acknowledged — local plugin commands ran without needing my input") instead of *executed* by Claude Code. The slash must be the very first character of input.
+
+4. **`/reload-plugins` after install.** Each `/plugin install` reports `Run /reload-plugins to apply` — required for the new content to take effect in the active session. Don't trust `/context` until you've reloaded.
+
+5. **Duplicate installs are silent.** Same skill installed via two different routes (e.g. bundled inside one plugin AND standalone via another marketplace) coexists without warning. Disambiguation happens via the namespace prefix at invocation time. Practical case: `story-present` ships bundled inside `pete-pa` AND is publicly installable via `petermcalister-shared-skills` — both routes work, both surface in `/context`, both are reachable via their respective namespace prefix.
+
+6. **Plugin skills appear under `/context > Skills > Plugin`, not `Project`.** Don't expect a marketplace-installed plugin's skills to show up in the same place as project-local skills. They're under a separate "Plugin: <name>" subheading. `/context` discoverability is incidental — the authoritative test is whether the skill loads when invoked.
