@@ -136,7 +136,7 @@ restored. Better no evals than wrong evals.
 ## Install commands for consumers
 
 The full canonical reference (with expected output, validation checklist, and diagnostic
-notes) lives in `.claude/plans/skill-marketplace-restructure-install-commands.md`. The
+notes) lives in `.claude/guides/marketplace-install.md`. The
 two install paths a consumer typically needs:
 
 ```text
