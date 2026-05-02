@@ -106,7 +106,7 @@ These were all valid in v0.5.0 and earlier. They are dead in v0.6.0:
 |---|---|
 | Symlink/junction skills from shared-skills into a consumer's `.claude/skills/` | The marketplace install does this for you, and symlinks across repos break in CI, on different drives, and inside plugin zips. |
 | Add `~/RepoBase/shared-skills` to `permissions.additionalDirectories` for skill discovery | Discovery now happens via plugin install. `additionalDirectories` is for genuine cross-repo file access, not skill plumbing. |
-| `bash deploy-plugin.sh` to package pete-pa as a zip and drag-and-drop | Replaced by `/plugin marketplace add petermcalister/cowork-pa` + `/plugin install pete-pa@cowork-private`. The script lives only in `scripts/legacy/` for git-blame archaeology. |
+| Package pete-pa as a `.plugin.zip` and drag-and-drop into Claude Code | Replaced by `/plugin marketplace add petermcalister/cowork-pa` + `/plugin install pete-pa@cowork-private`. The retired build script lives only in `scripts/legacy/` for git-blame archaeology. |
 | Edit a skill directly in `~/RepoBase/shared-skills/.claude/skills/` | Edits there are clobbered by the next `library-promote`. Edit the master in cowork, then promote. |
 | `pip install -e ~/RepoBase/shared-skills` | The shared-skills repo no longer registers any commands via `pyproject.toml`. The new `library-promote` tool is registered by **cowork**'s pyproject.toml. |
 
