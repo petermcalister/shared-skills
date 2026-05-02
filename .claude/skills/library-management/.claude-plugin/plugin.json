@@ -1,0 +1,9 @@
+{
+  "name": "library-management",
+  "version": "0.6.0",
+  "description": "Documents the 2x2 storage model (private/public x coding/productivity), the library-promote lifecycle, and marketplace install commands for cowork-private and petermcalister-shared-skills",
+  "author": {
+    "name": "Peter McAlister",
+    "email": "petermcalister@gmail.com"
+  }
+}
